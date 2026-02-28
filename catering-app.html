@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5th Element Indian Grill – Catering</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --cream: #f8f4ee;
+    --warm-white: #fdfaf6;
+    --charcoal: #1a1714;
+    --dark-brown: #2c2420;
+    --gold: #b8860b;
+    --gold-light: #d4a843;
+    --terracotta: #c4623a;
+    --sage: #6b7c5e;
+    --muted: #8a8178;
+    --border: #e0d8ce;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--charcoal);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: none; border: none; cursor: pointer;
+    color: #a09890; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 8px 16px; border-radius: 4px; transition: all 0.2s;
+  }
+  .nav-tab.active, .nav-tab:hover { background: rgba(212,168,67,0.15); color: var(--gold-light); }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* HERO */
+  .hero {
+    background: var(--dark-brown);
+    padding: 64px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(184,134,11,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(196,98,58,0.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 7vw, 64px); font-weight: 300;
+    color: var(--warm-white); line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold-light); }
+  .hero p { color: #a09890; font-size: 15px; max-width: 480px; margin: 0 auto 32px; line-height: 1.6; }
+  .btn-primary {
+    background: var(--gold); color: var(--charcoal);
+    border: none; padding: 14px 32px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; border-radius: 2px; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* FORM */
+  .form-container {
+    max-width: 680px; margin: 0 auto; padding: 40px 20px 80px;
+  }
+  .form-section {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--dark-brown);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-icon { font-size: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:540px){ .form-row { grid-template-columns: 1fr; } }
+  .form-group { margin-bottom: 18px; }
+  .form-group:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 12px; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border); border-radius: 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    background: var(--cream); color: var(--charcoal);
+    transition: border-color 0.2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 90px; }
+  select { appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8178' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+  /* MENU ITEMS */
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:480px){ .menu-grid { grid-template-columns: 1fr; } }
+  .menu-item {
+    border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 14px; cursor: pointer; transition: all 0.18s;
+    position: relative;
+  }
+  .menu-item:hover { border-color: var(--gold); }
+  .menu-item.selected { border-color: var(--gold); background: rgba(184,134,11,0.06); }
+  .menu-item.selected::after {
+    content: '✓';
+    position: absolute; top: 10px; right: 12px;
+    color: var(--gold); font-size: 14px; font-weight: 600;
+  }
+  .menu-item-name { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .menu-item-desc { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .menu-item-price { font-size: 13px; color: var(--gold); font-weight: 500; }
+
+  /* PRICING SUMMARY */
+  .price-summary {
+    background: var(--dark-brown);
+    border-radius: 8px; padding: 24px; margin-top: 8px;
+    color: var(--warm-white);
+  }
+  .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; color: #c0b8b0; }
+  .price-row.total { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 12px; margin-top: 8px;
+    font-size: 18px; color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+  .price-deposit { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  /* PAYMENT */
+  .payment-card {
+    background: var(--warm-white); border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 20px; margin-bottom: 16px;
+    cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 14px;
+  }
+  .payment-card:hover, .payment-card.selected { border-color: var(--gold); }
+  .payment-radio {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--border); flex-shrink: 0; position: relative;
+    transition: border-color 0.2s;
+  }
+  .payment-card.selected .payment-radio { border-color: var(--gold); }
+  .payment-card.selected .payment-radio::after {
+    content: ''; position: absolute; inset: 3px;
+    background: var(--gold); border-radius: 50%;
+  }
+  .payment-label { font-size: 14px; font-weight: 500; }
+  .payment-sub { font-size: 12px; color: var(--muted); }
+  .cc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .cc-fields .full { grid-column: 1/-1; }
+
+  .submit-btn {
+    width: 100%; padding: 18px; background: var(--gold);
+    border: none; border-radius: 4px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--charcoal); cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .submit-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* SUCCESS */
+  .success-screen {
+    max-width: 520px; margin: 60px auto; padding: 20px;
+    text-align: center;
+  }
+  .success-icon { font-size: 56px; margin-bottom: 20px; }
+  .success-screen h2 {
+    font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300;
+    margin-bottom: 12px; color: var(--dark-brown);
+  }
+  .success-screen p { color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+  .success-ref {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px; margin-bottom: 28px;
+    font-size: 13px; color: var(--charcoal);
+  }
+  .ref-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold); font-weight: 600; }
+  .pdf-btn {
+    background: none; border: 1.5px solid var(--gold); color: var(--gold);
+    padding: 12px 28px; border-radius: 4px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .pdf-btn:hover { background: var(--gold); color: var(--charcoal); }
+
+  /* ADMIN */
+  .admin-container { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+  .admin-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+  }
+  .admin-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600;
+  }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 8px; padding: 20px;
+  }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600; color: var(--gold); }
+  .stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 4px; }
+
+  .orders-table { width: 100%; border-collapse: collapse; }
+  .orders-table th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); padding: 10px 14px; border-bottom: 2px solid var(--border);
+  }
+  .orders-table td {
+    padding: 14px 14px; border-bottom: 1px solid var(--border); font-size: 14px;
+    vertical-align: top;
+  }
+  .orders-table tr:hover td { background: rgba(184,134,11,0.04); }
+  .status-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .status-pending { background: rgba(196,98,58,0.12); color: var(--terracotta); }
+  .status-confirmed { background: rgba(107,124,94,0.15); color: var(--sage); }
+  .status-paid { background: rgba(184,134,11,0.12); color: var(--gold); }
+  .action-btn {
+    background: none; border: 1px solid var(--border); padding: 5px 12px;
+    border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.15s;
+    color: var(--charcoal); font-family: 'DM Sans', sans-serif; margin-right: 4px;
+  }
+  .action-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; left: 24px; max-width: 380px; margin: auto;
+    background: var(--charcoal); color: var(--warm-white); padding: 14px 20px;
+    border-radius: 8px; font-size: 14px; z-index: 999;
+    transform: translateY(100px); opacity: 0; transition: all 0.3s;
+    border-left: 3px solid var(--gold);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  .progress-bar { display: flex; gap: 0; margin-bottom: 32px; }
+  .progress-step {
+    flex: 1; padding: 10px 0; text-align: center;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); border-bottom: 2px solid var(--border); transition: all 0.2s;
+    position: relative;
+  }
+  .progress-step.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .progress-step.done { color: var(--sage); border-bottom-color: var(--sage); }
+
+  .step-nav {
+    display: flex; gap: 12px; justify-content: space-between; margin-top: 8px;
+  }
+  .btn-back {
+    background: none; border: 1.5px solid var(--border); color: var(--muted);
+    padding: 12px 24px; border-radius: 4px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s; flex: 1;
+  }
+  .btn-back:hover { border-color: var(--charcoal); color: var(--charcoal); }
+  .btn-next {
+    background: var(--charcoal); color: var(--warm-white);
+    border: none; padding: 12px 24px; border-radius: 4px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s; flex: 2;
+  }
+  .btn-next:hover { background: var(--dark-brown); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">✦ 5th Element Indian Grill</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('order-view')">Order</button>
+    <button class="nav-tab" onclick="showView('admin-view')">Admin</button>
+  </div>
+</nav>
+
+<!-- ORDER VIEW -->
+<div id="order-view" class="view active">
+  <div id="hero-section" class="hero">
+    <div class="hero-eyebrow">Catering & Events</div>
+    <h1>Bold Flavors,<br><em>Timeless</em><br>Celebrations</h1>
+    <p>From intimate corporate lunches to grand wedding receptions, 5th Element Indian Grill brings the rich, aromatic flavors of India to your special occasion.</p>
+    <button class="btn-primary" onclick="startOrder()">Request a Quote →</button>
+  </div>
+
+  <div id="form-section" style="display:none;">
+    <div class="form-container">
+      <div class="progress-bar">
+        <div class="progress-step active" id="step-1">1 · Details</div>
+        <div class="progress-step" id="step-2">2 · Menu</div>
+        <div class="progress-step" id="step-3">3 · Payment</div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div id="form-step-1">
+        <div class="form-section">
+          <div class="section-title"><span class="section-icon">👤</span> Contact Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="firstName" placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lastName" placeholder="Smith">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="email" placeholder="jane@email.com">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="phone" placeholder="(555) 000-0000">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-title"><span class="section-icon">📅</span> Event Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Event Date</label>
+              <input type="date" id="eventDate">
+            </div>
+            <div class="form-group">
+              <label>Event Time</label>
+              <input type="time" id="eventTime">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Venue / Location</label>
+            <input type="text" id="venue" placeholder="123 Main St, City, State">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Guest Count</label>
+              <input type="number" id="guestCount" placeholder="50" min="10">
+            </div>
+            <div class="form-group">
+              <label>Budget Range</label>
+              <select id="budget">
+                <option value="">Select range...</option>
+                <option value="$500–$1,000">$500 – $1,000</option>
+                <option value="$1,000–$2,500">$1,000 – $2,500</option>
+                <option value="$2,500–$5,000">$2,500 – $5,000</option>
+                <option value="$5,000–$10,000">$5,000 – $10,000</option>
+                <option value="$10,000+">$10,000+</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Event Type</label>
+            <select id="eventType">
+              <option value="">Select type...</option>
+              <option>Corporate Lunch / Dinner</option>
+              <option>Wedding Reception</option>
+              <option>Birthday Celebration</option>
+              <option>Holiday Party</option>
+              <option>Cocktail Reception</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Special Requests / Notes</label>
+            <textarea id="notes" placeholder="Dietary restrictions, setup preferences, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn-back" onclick="cancelForm()">← Back</button>
+          <button class="btn-next" onclick="goToStep(2)">Continue to Menu →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="form-step-2" style="display:none;">
+        <div class="form-section">
+          <div class="section-title"><span class="section-icon">🍽️</span> Select Menu Items</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Prices are per person. Select all that apply for your event.</p>
+          <div class="menu-grid" id="menu-grid"></div>
+        </div>
+        <div class="form-section" id="summary-section" style="display:none;">
+          <div class="section-title"><span class="section-icon">📊</span> Pricing Summary</div>
+          <div class="price-summary" id="price-summary"></div>
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn-next" onclick="goToStep(3)">Continue to Payment →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="form-step-3" style="display:none;">
+        <div class="form-section">
+          <div class="section-title"><span class="section-icon">💳</span> Secure Payment</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">A 30% deposit is required to confirm your booking. The balance is due 72 hours before the event.</p>
+
+          <div class="payment-card selected" id="pay-card" onclick="selectPayment('card')">
+            <div class="payment-radio"></div>
+            <div>
+              <div class="payment-label">Credit / Debit Card</div>
+              <div class="payment-sub">Visa, Mastercard, Amex, Discover</div>
+            </div>
+          </div>
+          <div class="payment-card" id="pay-invoice" onclick="selectPayment('invoice')">
+            <div class="payment-radio"></div>
+            <div>
+              <div class="payment-label">Pay by Invoice</div>
+              <div class="payment-sub">We'll send an invoice within 24 hours</div>
+            </div>
+          </div>
+
+          <div id="cc-form">
+            <div class="cc-fields">
+              <div class="form-group full">
+                <label>Cardholder Name</label>
+                <input type="text" id="cardName" placeholder="Jane Smith">
+              </div>
+              <div class="form-group full">
+                <label>Card Number</label>
+                <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCard(this)">
+              </div>
+              <div class="form-group">
+                <label>Expiration</label>
+                <input type="text" id="cardExp" placeholder="MM / YY" maxlength="7" oninput="formatExp(this)">
+              </div>
+              <div class="form-group">
+                <label>CVV</label>
+                <input type="text" id="cardCVV" placeholder="123" maxlength="4">
+              </div>
+            </div>
+          </div>
+
+          <div id="deposit-display" style="margin-top:16px;padding:16px;background:rgba(184,134,11,0.06);border-radius:6px;border:1px solid rgba(184,134,11,0.2);">
+            <div style="display:flex;justify-content:space-between;font-size:14px;">
+              <span>Total Estimate</span><span id="total-display" style="font-weight:500;">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;margin-top:8px;color:var(--gold);font-family:'Cormorant Garamond',serif;font-weight:600;">
+              <span>Deposit Due Today (30%)</span><span id="deposit-display-val">—</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="submitOrder()">✦ Confirm Order & Pay Deposit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="success-section" style="display:none;">
+    <div class="success-screen">
+      <div class="success-icon">🎉</div>
+      <h2>Order Confirmed!</h2>
+      <p>Your catering order has been received. A confirmation email has been sent to <strong id="confirm-email"></strong>.</p>
+      <div class="success-ref">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;">Order Reference</div>
+        <div class="ref-num" id="ref-num"></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="pdf-btn" onclick="downloadQuote()">⬇ Download PDF Quote</button>
+        <button class="btn-primary" onclick="resetForm()">Place New Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="admin-view" class="view">
+  <div class="admin-container">
+    <div class="admin-header">
+      <div class="admin-title">Orders Dashboard</div>
+      <button class="btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div style="background:var(--warm-white);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <div id="orders-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MENU_ITEMS = [
+  { id:'app1', name:'Samosa Chaat', desc:'Crispy samosas, chickpeas, tamarind & mint chutney', price:8, cat:'Appetizer' },
+  { id:'app2', name:'Paneer Tikka', desc:'Marinated cottage cheese grilled in tandoor (V)', price:10, cat:'Appetizer' },
+  { id:'app3', name:'Chicken Seekh Kebab', desc:'Minced chicken with herbs, served with raita', price:12, cat:'Appetizer' },
+  { id:'app4', name:'Vegetable Pakora Station', desc:'Assorted fritters with chutneys (V)', price:7, cat:'Appetizer' },
+  { id:'bre1', name:'Tandoori Roti', desc:'Whole wheat bread from the clay oven (V)', price:3, cat:'Bread' },
+  { id:'bre2', name:'Garlic Naan', desc:'Leavened bread with garlic & butter (V)', price:4, cat:'Bread' },
+  { id:'ent1', name:'Butter Chicken', desc:'Tender chicken in a rich tomato-cream sauce', price:18, cat:'Entrée' },
+  { id:'ent2', name:'Lamb Rogan Josh', desc:'Slow-cooked Kashmiri lamb with aromatic spices', price:24, cat:'Entrée' },
+  { id:'ent3', name:'Palak Paneer', desc:'Fresh spinach with cottage cheese & spices (V)', price:16, cat:'Entrée' },
+  { id:'ent4', name:'Dal Makhani', desc:'Black lentils slow-cooked overnight, cream & butter (V)', price:14, cat:'Entrée' },
+  { id:'ent5', name:'Chicken Biryani', desc:'Fragrant basmati rice layered with spiced chicken', price:20, cat:'Entrée' },
+  { id:'ent6', name:'Prawn Masala', desc:'Prawns in a tangy onion-tomato gravy', price:26, cat:'Entrée' },
+  { id:'sid1', name:'Jeera Rice', desc:'Basmati rice tempered with cumin (V)', price:5, cat:'Side' },
+  { id:'sid2', name:'Raita', desc:'Yogurt with cucumber, cumin & mint (V)', price:4, cat:'Side' },
+  { id:'sid3', name:'Mixed Pickle & Chutneys', desc:'Mango pickle, tamarind & mint chutneys (V)', price:3, cat:'Side' },
+  { id:'des1', name:'Gulab Jamun', desc:'Soft milk-solid dumplings in rose syrup (V)', price:7, cat:'Dessert' },
+  { id:'des2', name:'Mango Kulfi', desc:'Traditional Indian ice cream, cardamom & pistachio (V)', price:8, cat:'Dessert' },
+  { id:'des3', name:'Rasmalai', desc:'Cottage cheese patties in saffron-cardamom cream (V)', price:9, cat:'Dessert' },
+];
+
+// ── Supabase REST config ─────────────────────────────────────────
+const SUPABASE_URL = 'https://gozzrfstsmuwfmvkxdxf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ylR8nm3pTbSicW0py6QzYw_E0ILWn_R';
+
+const db = {
+  async insert(table, row) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(row)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.error || 'Insert failed');
+    return Array.isArray(data) ? data[0] : data;
+  },
+  async select(table, order = 'created_at.desc') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?order=${order}`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.error || 'Select failed');
+    return data;
+  },
+  async update(table, id, fields) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(fields)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.error || 'Update failed');
+    return data;
+  }
+};
+// ─────────────────────────────────────────────────────────────────
+
+let selectedItems = new Set();
+let currentOrder = null;
+let orders = [];
+let paymentMethod = 'card';
+let currentStep = 1;
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  if(id==='admin-view') renderAdmin();
+}
+
+function startOrder() {
+  document.getElementById('hero-section').style.display='none';
+  document.getElementById('form-section').style.display='block';
+  renderMenu();
+}
+
+function cancelForm() {
+  document.getElementById('hero-section').style.display='block';
+  document.getElementById('form-section').style.display='none';
+  goToStep(1);
+}
+
+function goToStep(n) {
+  if(n===2 && !validateStep1()) return;
+  if(n===3 && selectedItems.size===0) { showToast('Please select at least one menu item'); return; }
+  currentStep = n;
+  for(let i=1;i<=3;i++){
+    document.getElementById(`form-step-${i}`).style.display = i===n?'block':'none';
+    const s = document.getElementById(`step-${i}`);
+    s.className = 'progress-step' + (i<n?' done':i===n?' active':'');
+  }
+  if(n===3) updateDepositDisplay();
+}
+
+function validateStep1() {
+  const fields = ['firstName','lastName','email','phone','eventDate','venue','guestCount'];
+  for(let f of fields) {
+    if(!document.getElementById(f).value.trim()) {
+      showToast('Please fill in all required fields');
+      document.getElementById(f).focus();
+      return false;
+    }
+  }
+  return true;
+}
+
+function renderMenu() {
+  const grid = document.getElementById('menu-grid');
+  grid.innerHTML = MENU_ITEMS.map(item=>`
+    <div class="menu-item ${selectedItems.has(item.id)?'selected':''}" onclick="toggleItem('${item.id}')">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px;">${item.cat}</div>
+      <div class="menu-item-name">${item.name}</div>
+      <div class="menu-item-desc">${item.desc}</div>
+      <div class="menu-item-price">$${item.price} / person</div>
+    </div>`).join('');
+}
+
+function toggleItem(id) {
+  selectedItems.has(id) ? selectedItems.delete(id) : selectedItems.add(id);
+  renderMenu();
+  updateSummary();
+}
+
+function getTotal() {
+  const guests = parseInt(document.getElementById('guestCount').value)||0;
+  const itemTotal = [...selectedItems].reduce((s,id)=>{
+    const item = MENU_ITEMS.find(m=>m.id===id);
+    return s + (item?item.price:0);
+  },0);
+  return itemTotal * guests;
+}
+
+function updateSummary() {
+  const guests = parseInt(document.getElementById('guestCount').value)||0;
+  const section = document.getElementById('summary-section');
+  if(selectedItems.size===0){ section.style.display='none'; return; }
+  section.style.display='block';
+  const total = getTotal();
+  const deposit = Math.round(total*0.3);
+  const rows = [...selectedItems].map(id=>{
+    const item = MENU_ITEMS.find(m=>m.id===id);
+    return `<div class="price-row"><span>${item.name}</span><span>$${item.price} × ${guests}</span></div>`;
+  }).join('');
+  document.getElementById('price-summary').innerHTML = `
+    ${rows}
+    <div class="price-row total"><span>Estimated Total</span><span>$${total.toLocaleString()}</span></div>
+    <div class="price-deposit" style="color:#c0b8b0;font-size:12px;margin-top:8px;">
+      30% deposit: $${deposit.toLocaleString()} · Balance due 72hrs before event
+    </div>`;
+}
+
+function updateDepositDisplay() {
+  const total = getTotal();
+  document.getElementById('total-display').textContent = `$${total.toLocaleString()}`;
+  document.getElementById('deposit-display-val').textContent = `$${Math.round(total*0.3).toLocaleString()}`;
+}
+
+function selectPayment(type) {
+  paymentMethod = type;
+  document.getElementById('pay-card').classList.toggle('selected', type==='card');
+  document.getElementById('pay-invoice').classList.toggle('selected', type==='invoice');
+  document.getElementById('cc-form').style.display = type==='card'?'block':'none';
+}
+
+function formatCard(el) {
+  el.value = el.value.replace(/\D/g,'').replace(/(\d{4})(?=\d)/g,'$1 ');
+}
+function formatExp(el) {
+  el.value = el.value.replace(/\D/g,'').replace(/(\d{2})(?=\d)/g,'$1 / ');
+}
+
+async function submitOrder() {
+  if(paymentMethod==='card') {
+    if(!document.getElementById('cardName').value || !document.getElementById('cardNumber').value) {
+      showToast('Please complete card details'); return;
+    }
+  }
+  const submitBtn = document.querySelector('.submit-btn');
+  submitBtn.textContent = 'Saving order…';
+  submitBtn.disabled = true;
+
+  const ref = 'CAT-' + Date.now().toString(36).toUpperCase().slice(-6);
+  const total = getTotal();
+  const orderData = {
+    ref,
+    name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+    email: document.getElementById('email').value,
+    phone: document.getElementById('phone').value,
+    event_date: document.getElementById('eventDate').value,
+    event_time: document.getElementById('eventTime').value,
+    venue: document.getElementById('venue').value,
+    guests: parseInt(document.getElementById('guestCount').value),
+    budget: document.getElementById('budget').value,
+    event_type: document.getElementById('eventType').value,
+    notes: document.getElementById('notes').value,
+    items: [...selectedItems].map(id=>MENU_ITEMS.find(m=>m.id===id)),
+    total,
+    deposit: Math.round(total*0.3),
+    payment_method: paymentMethod,
+    status: paymentMethod==='card' ? 'Paid' : 'Pending',
+  };
+
+  try {
+    const saved = await db.insert('orders', orderData);
+
+    currentOrder = {
+      ...orderData,
+      date: orderData.event_date,
+      time: orderData.event_time,
+      eventType: orderData.event_type,
+      paymentMethod: orderData.payment_method,
+      createdAt: saved.created_at,
+    };
+
+    document.getElementById('form-section').style.display='none';
+    document.getElementById('success-section').style.display='block';
+    document.getElementById('confirm-email').textContent = currentOrder.email;
+    document.getElementById('ref-num').textContent = ref;
+    showToast('✓ Order saved to database!');
+  } catch(err) {
+    console.error(err);
+    showToast('⚠ Error saving order: ' + (err.message || 'Please try again'));
+  } finally {
+    submitBtn.textContent = '✦ Confirm Order & Pay Deposit';
+    submitBtn.disabled = false;
+  }
+}
+
+function resetForm() {
+  selectedItems = new Set();
+  currentOrder = null;
+  document.getElementById('success-section').style.display='none';
+  document.getElementById('hero-section').style.display='block';
+  document.querySelectorAll('input,select,textarea').forEach(el=>el.value='');
+  goToStep(1);
+}
+
+function downloadQuote() {
+  if(!currentOrder) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const o = currentOrder;
+  
+  doc.setFillColor(26,23,20);
+  doc.rect(0,0,210,50,'F');
+  doc.setTextColor(212,168,67);
+  doc.setFontSize(26);
+  doc.setFont('helvetica','italic');
+  doc.text('5th Element Indian Grill', 20, 28);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(160,152,144);
+  doc.text('CATERING QUOTE', 20, 40);
+  doc.text(o.ref, 190, 40, {align:'right'});
+
+  doc.setTextColor(26,23,20);
+  doc.setFontSize(12);
+  doc.setFont('helvetica','bold');
+  doc.text('Client Information', 20, 68);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.text(`Name: ${o.name}`, 20, 78);
+  doc.text(`Email: ${o.email}`, 20, 86);
+  doc.text(`Phone: ${o.phone}`, 20, 94);
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.text('Event Details', 110, 68);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.text(`Date: ${o.date} at ${o.time}`, 110, 78);
+  doc.text(`Venue: ${o.venue}`, 110, 86);
+  doc.text(`Guests: ${o.guests}`, 110, 94);
+  doc.text(`Type: ${o.eventType||'—'}`, 110, 102);
+
+  doc.setDrawColor(224,216,206);
+  doc.line(20,112,190,112);
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.text('Menu Selection', 20, 124);
+  let y = 134;
+  o.items.forEach(item=>{
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    doc.text(`${item.name} (${item.cat})`, 20, y);
+    doc.text(`$${item.price}/pp × ${o.guests} = $${item.price*o.guests}`, 190, y, {align:'right'});
+    y+=10;
+  });
+
+  doc.line(20,y+4,190,y+4);
+  y+=14;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.setTextColor(184,134,11);
+  doc.text('TOTAL ESTIMATE', 20, y);
+  doc.text(`$${o.total.toLocaleString()}`, 190, y, {align:'right'});
+  y+=10;
+  doc.setFontSize(10);
+  doc.setTextColor(100,90,80);
+  doc.text(`30% Deposit (${o.paymentMethod==='card'?'Paid':'Invoice Pending'})`, 20, y);
+  doc.text(`$${o.deposit.toLocaleString()}`, 190, y, {align:'right'});
+
+  if(o.notes) {
+    y+=16;
+    doc.setTextColor(26,23,20);
+    doc.setFont('helvetica','bold');
+    doc.text('Notes', 20, y);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(10);
+    const noteLines = doc.splitTextToSize(o.notes, 170);
+    doc.text(noteLines, 20, y+10);
+  }
+
+  doc.setFontSize(8);
+  doc.setTextColor(160,152,144);
+  doc.text('Thank you for choosing 5th Element Indian Grill for your event. We look forward to serving you.', 105, 285, {align:'center'});
+  doc.save(`Quote-${o.ref}.pdf`);
+}
+
+async function renderAdmin() {
+  document.getElementById('stats-row').innerHTML = `<div style="color:var(--muted);padding:20px;font-size:14px;">Loading orders…</div>`;
+  document.getElementById('orders-list').innerHTML = '';
+
+  try {
+    orders = await db.select('orders', 'created_at.desc');
+  } catch(err) {
+    document.getElementById('stats-row').innerHTML = `<div style="color:var(--terracotta);padding:20px;font-size:14px;">⚠ Could not load orders: ${err.message}</div>`;
+    return;
+  }
+
+  const pending = orders.filter(o=>o.status==='Pending').length;
+  const paid = orders.filter(o=>o.status==='Paid').length;
+  const confirmed = orders.filter(o=>o.status==='Confirmed').length;
+  const revenue = orders.reduce((s,o)=>s+(o.deposit||0),0);
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${orders.length}</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-card"><div class="stat-value">${confirmed + paid}</div><div class="stat-label">Confirmed</div></div>
+    <div class="stat-card"><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-value">$${revenue.toLocaleString()}</div><div class="stat-label">Deposits Collected</div></div>`;
+
+  if(orders.length===0) {
+    document.getElementById('orders-list').innerHTML=`<div class="empty-state"><div class="emoji">📋</div><p>No orders yet. Once customers submit orders, they'll appear here.</p></div>`;
+    return;
+  }
+
+  document.getElementById('orders-list').innerHTML=`
+    <table class="orders-table">
+      <thead><tr>
+        <th>Ref</th><th>Client</th><th>Event Date</th><th>Guests</th><th>Total</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${orders.map((o,i)=>`
+        <tr>
+          <td style="font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--gold)">${o.ref}</td>
+          <td><strong>${o.name}</strong><br><span style="font-size:12px;color:var(--muted)">${o.email}</span></td>
+          <td>${o.event_date||'—'}<br><span style="font-size:12px;color:var(--muted)">${o.event_time||''}</span></td>
+          <td>${o.guests}</td>
+          <td><strong>$${(o.total||0).toLocaleString()}</strong><br><span style="font-size:12px;color:var(--muted)">Dep: $${(o.deposit||0).toLocaleString()}</span></td>
+          <td><span class="status-badge status-${(o.status||'pending').toLowerCase()}">${o.status||'Pending'}</span></td>
+          <td>
+            <button class="action-btn" onclick="viewOrder(${i})">View</button>
+            <button class="action-btn" onclick="confirmOrder('${o.id}', ${i})">Confirm</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function viewOrder(i) {
+  const o = orders[i];
+  const itemList = (o.items||[]).map(m=>`  • ${m.name} ($${m.price}/pp)`).join('\n');
+  alert(`ORDER: ${o.ref}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue}\nGuests: ${o.guests}\nType: ${o.event_type||'—'}\n\nMenu:\n${itemList}\n\nTotal: $${(o.total||0).toLocaleString()}\nDeposit: $${(o.deposit||0).toLocaleString()}\nPayment: ${o.payment_method}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
+}
+
+async function confirmOrder(id, i) {
+  try {
+    await db.update('orders', id, { status: 'Confirmed' });
+    orders[i].status = 'Confirmed';
+    showToast(`Order ${orders[i].ref} confirmed!`);
+    renderAdmin();
+  } catch(err) {
+    showToast('⚠ Could not confirm order: ' + err.message);
+  }
+}
+
+function exportCSV() {
+  if(orders.length===0){showToast('No orders to export');return;}
+  const headers='Ref,Name,Email,Phone,Date,Venue,Guests,Total,Deposit,Status,Event Type';
+  const rows = orders.map(o=>`${o.ref},"${o.name}",${o.email},${o.phone},${o.event_date},"${o.venue}",${o.guests},${o.total||0},${o.deposit||0},${o.status},"${o.event_type||''}"`);
+  const csv = [headers,...rows].join('\n');
+  const a = document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='catering-orders.csv';
+  a.click();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
