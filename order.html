@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Details – 5th Element Indian Grill</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --cream:#f8f4ee;--warm-white:#fdfaf6;--charcoal:#1a1714;--dark-brown:#2c2420;
+  --gold:#b8860b;--gold-light:#d4a843;--terracotta:#c4623a;--sage:#6b7c5e;
+  --muted:#8a8178;--border:#e0d8ce;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;}
+
+/* ── NAV ── */
+nav{background:var(--charcoal);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-light);letter-spacing:0.06em;text-decoration:none;}
+.nav-back{background:none;border:1px solid rgba(212,168,67,0.3);color:#c8b88a;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;padding:6px 14px;border-radius:4px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+.nav-back:hover{border-color:var(--gold-light);color:var(--gold-light);}
+
+/* ── LOADING / ERROR STATES ── */
+.state-screen{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.state-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:10px;color:var(--dark-brown);}
+.state-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:360px;margin:0 auto 24px;}
+.btn-home{display:inline-block;background:var(--gold);color:var(--charcoal);border:none;padding:12px 28px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+.btn-home:hover{background:var(--gold-light);}
+
+/* ── ORDER PAGE ── */
+.order-page{max-width:600px;margin:0 auto;padding:32px 20px 60px;}
+
+/* Header card */
+.order-header-card{background:var(--dark-brown);border-radius:12px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;}
+.order-header-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(184,134,11,0.2) 0%,transparent 60%);pointer-events:none;}
+.order-brand{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;}
+.order-ref-label{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:#6a6058;margin-bottom:4px;}
+.order-ref{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--gold-light);letter-spacing:0.04em;margin-bottom:16px;}
+.order-status-row{display:flex;align-items:center;gap:10px;}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:0.05em;text-transform:uppercase;}
+.status-pill.pending{background:rgba(196,98,58,0.2);color:#e07a55;}
+.status-pill.confirmed{background:rgba(107,124,94,0.25);color:#8aad7c;}
+.status-pill.paid{background:rgba(184,134,11,0.2);color:var(--gold-light);}
+.status-pill::before{content:'●';font-size:8px;}
+.order-date-placed{font-size:12px;color:#6a6058;margin-left:auto;}
+
+/* Info cards */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:480px){.info-grid{grid-template-columns:1fr;}}
+.info-card{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.info-card-title{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.info-row{margin-bottom:8px;}
+.info-row:last-child{margin-bottom:0;}
+.info-label{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:2px;}
+.info-value{font-size:14px;color:var(--charcoal);font-weight:500;line-height:1.4;}
+.info-value.highlight{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:16px;}
+
+/* Menu items card */
+.menu-card{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:14px;}
+.menu-card-title{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:500;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.menu-line{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);}
+.menu-line:last-child{border-bottom:none;}
+.menu-line-left{}
+.menu-line-name{font-size:14px;font-weight:500;margin-bottom:2px;}
+.menu-line-meta{font-size:11px;color:var(--muted);}
+.menu-line-price{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap;margin-left:12px;}
+
+/* Totals card */
+.totals-card{background:var(--dark-brown);border-radius:10px;padding:20px;margin-bottom:14px;}
+.totals-row{display:flex;justify-content:space-between;font-size:13px;color:#7a7068;padding:5px 0;}
+.totals-divider{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0;}
+.totals-grand{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0 0;}
+.totals-grand-label{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--warm-white);}
+.totals-grand-value{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gold-light);}
+.deposit-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;background:rgba(184,134,11,0.1);border-radius:6px;padding:10px 12px;}
+.deposit-label{font-size:12px;color:var(--gold-light);}
+.deposit-value{font-size:16px;font-weight:600;color:var(--gold-light);font-family:'Cormorant Garamond',serif;}
+
+/* Notes card */
+.notes-card{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px;}
+.notes-card-title{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gold);font-weight:500;margin-bottom:10px;}
+.notes-text{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* Cash notice */
+.cash-notice{background:rgba(107,124,94,0.08);border:1px solid rgba(107,124,94,0.25);border-radius:10px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px;}
+.cash-notice-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.cash-notice-text{font-size:13px;color:var(--sage);line-height:1.55;}
+.cash-notice-text strong{display:block;margin-bottom:3px;font-size:14px;}
+
+/* Action buttons */
+.actions{display:flex;gap:10px;flex-wrap:wrap;}
+.btn-pdf{flex:1;min-width:140px;background:var(--gold);color:var(--charcoal);border:none;padding:14px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;text-align:center;}
+.btn-pdf:hover{background:var(--gold-light);}
+.btn-outline{flex:1;min-width:140px;background:none;color:var(--charcoal);border:1.5px solid var(--border);padding:14px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;text-align:center;}
+.btn-outline:hover{border-color:var(--charcoal);}
+
+/* Print styles */
+@media print{
+  nav,.actions,.cash-notice{display:none!important;}
+  body{background:white;}
+  .order-page{padding:0;max-width:100%;}
+  .order-header-card,.menu-card,.info-card,.totals-card,.notes-card{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">✦ 5th Element Indian Grill</a>
+  <a class="nav-back" href="index.html">← Place New Order</a>
+</nav>
+
+<!-- LOADING -->
+<div class="state-screen" id="loading-state">
+  <div>
+    <div class="spinner"></div>
+    <div class="state-title">Loading your order…</div>
+    <div class="state-sub">Fetching your order details from our system.</div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div class="state-screen" id="error-state" style="display:none;">
+  <div>
+    <div style="font-size:48px;margin-bottom:16px;">🔍</div>
+    <div class="state-title">Order Not Found</div>
+    <div class="state-sub" id="error-message">We couldn't find an order with that reference number. Please check the link and try again.</div>
+    <a class="btn-home" href="index.html">Return Home</a>
+  </div>
+</div>
+
+<!-- ORDER DETAILS -->
+<div id="order-content" style="display:none;">
+  <div class="order-page">
+
+    <!-- HEADER -->
+    <div class="order-header-card">
+      <div class="order-brand">✦ Catering Order</div>
+      <div class="order-ref-label">Order Reference</div>
+      <div class="order-ref" id="od-ref">—</div>
+      <div class="order-status-row">
+        <span class="status-pill" id="od-status-pill">Pending</span>
+        <span class="order-date-placed" id="od-placed">—</span>
+      </div>
+    </div>
+
+    <!-- CLIENT + EVENT INFO -->
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-title">👤 Customer</div>
+        <div class="info-row">
+          <div class="info-label">Name</div>
+          <div class="info-value" id="od-name">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Phone</div>
+          <div class="info-value" id="od-phone">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Email</div>
+          <div class="info-value" id="od-email" style="font-size:13px;">—</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">📅 Event</div>
+        <div class="info-row">
+          <div class="info-label">Date &amp; Time</div>
+          <div class="info-value" id="od-datetime">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Order Type</div>
+          <div class="info-value highlight" id="od-ordertype">—</div>
+        </div>
+        <div class="info-row" id="od-venue-row">
+          <div class="info-label" id="od-venue-label">Venue</div>
+          <div class="info-value" id="od-venue" style="font-size:13px;">—</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">Guests</div>
+          <div class="info-value" id="od-guests">—</div>
+        </div>
+        <div class="info-row" id="od-eventtype-row" style="display:none;">
+          <div class="info-label">Event Type</div>
+          <div class="info-value" id="od-eventtype" style="font-size:13px;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU ITEMS -->
+    <div class="menu-card">
+      <div class="menu-card-title">🍽️ Menu Selection</div>
+      <div id="od-items">—</div>
+    </div>
+
+    <!-- TOTALS -->
+    <div class="totals-card">
+      <div class="totals-row"><span>Items (per person)</span><span id="od-per-person">—</span></div>
+      <div class="totals-row"><span>Guest Count</span><span id="od-guest-count">—</span></div>
+      <hr class="totals-divider">
+      <div class="totals-grand">
+        <span class="totals-grand-label">Total</span>
+        <span class="totals-grand-value" id="od-total">—</span>
+      </div>
+      <div class="deposit-row">
+        <span class="deposit-label">💵 30% Cash Deposit Due</span>
+        <span class="deposit-value" id="od-deposit">—</span>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="notes-card" id="od-notes-card" style="display:none;">
+      <div class="notes-card-title">📝 Special Requests</div>
+      <div class="notes-text" id="od-notes"></div>
+    </div>
+
+    <!-- CASH NOTICE -->
+    <div class="cash-notice">
+      <div class="cash-notice-icon">💵</div>
+      <div class="cash-notice-text">
+        <strong>Cash Payment Required</strong>
+        Our team will contact you to arrange your 30% deposit. The remaining balance is due 72 hours before your event. Please keep this page saved for your records.
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn-outline" onclick="window.print()">🖨️ Print</button>
+      <a class="btn-outline" href="index.html">Place New Order</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://gozzrfstsmuwfmvkxdxf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ylR8nm3pTbSicW0py6QzYw_E0ILWn_R';
+
+let orderData = null;
+
+// ── FORMAT HELPERS ───────────────────────────────────────────────
+function formatDate(dateStr, timeStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  const dateFormatted = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  if (!timeStr) return dateFormatted;
+  const [h, m] = timeStr.split(':');
+  const hr = parseInt(h);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const hr12 = hr % 12 || 12;
+  return `${dateFormatted} at ${hr12}:${m} ${ampm}`;
+}
+
+function formatPlaced(isoStr) {
+  if (!isoStr) return '';
+  return 'Placed ' + new Date(isoStr).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function statusClass(status) {
+  const s = (status || '').toLowerCase();
+  if (s === 'confirmed') return 'confirmed';
+  if (s === 'paid') return 'paid';
+  return 'pending';
+}
+
+// ── FETCH ORDER ──────────────────────────────────────────────────
+async function loadOrder() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+
+  if (!ref) {
+    showError('No order reference found in the link. Please check the URL and try again.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?ref=eq.${encodeURIComponent(ref)}&limit=1`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch order');
+    if (!data || data.length === 0) {
+      showError(`Order "${ref}" was not found. Please double-check the link sent to you.`);
+      return;
+    }
+    orderData = data[0];
+    renderOrder(orderData);
+  } catch(err) {
+    showError('Unable to load order details. Please check your connection and try again.');
+    console.error(err);
+  }
+}
+
+// ── RENDER ORDER ─────────────────────────────────────────────────
+function renderOrder(o) {
+  document.title = `Order ${o.ref} – 5th Element Indian Grill`;
+
+  // Header
+  document.getElementById('od-ref').textContent = o.ref;
+  const pill = document.getElementById('od-status-pill');
+  pill.textContent = o.status || 'Pending';
+  pill.className = `status-pill ${statusClass(o.status)}`;
+  document.getElementById('od-placed').textContent = formatPlaced(o.created_at);
+
+  // Customer
+  document.getElementById('od-name').textContent = o.name || '—';
+  document.getElementById('od-phone').textContent = o.phone || '—';
+  document.getElementById('od-email').textContent = o.email || '—';
+
+  // Event
+  document.getElementById('od-datetime').textContent = formatDate(o.event_date, o.event_time);
+  const orderType = o.budget || o.event_type || '—'; // budget col stores Delivery/Pickup
+  document.getElementById('od-ordertype').textContent = orderType;
+
+  if (o.venue) {
+    document.getElementById('od-venue-label').textContent = orderType === 'Delivery' ? 'Delivery Address' : 'Pickup Notes';
+    document.getElementById('od-venue').textContent = o.venue;
+  } else {
+    document.getElementById('od-venue-row').style.display = 'none';
+  }
+
+  document.getElementById('od-guests').textContent = `${o.guests} ${parseInt(o.guests) === 1 ? 'guest' : 'guests'}`;
+
+  if (o.event_type && o.event_type !== o.budget) {
+    document.getElementById('od-eventtype-row').style.display = 'block';
+    document.getElementById('od-eventtype').textContent = o.event_type;
+  }
+
+  // Menu items
+  const items = o.items || [];
+  const perPerson = items.reduce((s, item) => s + (item.price * (item.qty || 1)), 0);
+  document.getElementById('od-items').innerHTML = items.length === 0
+    ? '<div style="color:var(--muted);font-size:13px;">No items recorded.</div>'
+    : items.map(item => `
+        <div class="menu-line">
+          <div class="menu-line-left">
+            <div class="menu-line-name">${item.name}</div>
+            <div class="menu-line-meta">$${item.price}/pp × ${item.qty || 1} serving${(item.qty||1)>1?'s':''}</div>
+          </div>
+          <div class="menu-line-price">$${(item.price * (item.qty||1))}/pp</div>
+        </div>`).join('');
+
+  // Totals
+  document.getElementById('od-per-person').textContent = `$${perPerson}/pp`;
+  document.getElementById('od-guest-count').textContent = `× ${o.guests}`;
+  document.getElementById('od-total').textContent = `$${(o.total || 0).toLocaleString()}`;
+  document.getElementById('od-deposit').textContent = `$${(o.deposit || 0).toLocaleString()}`;
+
+  // Notes
+  if (o.notes && o.notes.trim()) {
+    document.getElementById('od-notes-card').style.display = 'block';
+    document.getElementById('od-notes').textContent = o.notes;
+  }
+
+  // Show page
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('order-content').style.display = 'block';
+}
+
+function showError(msg) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('error-message').textContent = msg;
+  document.getElementById('error-state').style.display = 'flex';
+}
+
+// ── PDF DOWNLOAD ─────────────────────────────────────────────────
+function downloadPDF() {
+  if (!orderData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const o = orderData;
+
+  // Header band
+  doc.setFillColor(26,23,20); doc.rect(0,0,210,52,'F');
+  doc.setTextColor(212,168,67); doc.setFontSize(22); doc.setFont('helvetica','italic');
+  doc.text('5th Element Indian Grill', 20, 26);
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(160,152,144);
+  doc.text('CATERING ORDER', 20, 38);
+  doc.text(o.ref, 190, 38, {align:'right'});
+
+  // Status badge area
+  const statusColor = (o.status||'').toLowerCase() === 'confirmed' ? [107,124,94] : (o.status||'').toLowerCase() === 'paid' ? [184,134,11] : [196,98,58];
+  doc.setFillColor(...statusColor); doc.roundedRect(20, 44, 36, 6, 1, 1, 'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(7); doc.setFont('helvetica','bold');
+  doc.text((o.status||'PENDING').toUpperCase(), 38, 48.5, {align:'center'});
+
+  // Date placed
+  doc.setFont('helvetica','normal'); doc.setTextColor(100,90,80); doc.setFontSize(8);
+  if (o.created_at) doc.text(`Placed: ${new Date(o.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`, 190, 48, {align:'right'});
+
+  let y = 64;
+
+  // Client & Event columns
+  doc.setTextColor(26,23,20); doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text('Customer', 20, y); doc.text('Event Details', 110, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,55,50);
+  y += 8;
+  doc.text(o.name || '—', 20, y); doc.text(formatDate(o.event_date, o.event_time), 110, y);
+  y += 7;
+  doc.text(o.phone || '—', 20, y); doc.text(`Type: ${o.budget || '—'}`, 110, y);
+  y += 7;
+  doc.setFontSize(8); doc.setTextColor(130,120,110);
+  doc.text(o.email || '—', 20, y);
+  if (o.venue) { doc.text(`${o.budget === 'Delivery' ? 'Address' : 'Notes'}: ${o.venue}`, 110, y); }
+  y += 7;
+  doc.setFontSize(9); doc.setTextColor(60,55,50);
+  doc.text(`Guests: ${o.guests}`, 110, y);
+  if (o.event_type && o.event_type !== o.budget) { y += 7; doc.text(`Event: ${o.event_type}`, 110, y); }
+
+  y += 12;
+  doc.setDrawColor(224,216,206); doc.line(20, y, 190, y);
+  y += 10;
+
+  // Menu
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(26,23,20);
+  doc.text('Menu Selection', 20, y);
+  doc.setFontSize(8); doc.setTextColor(184,134,11);
+  doc.text('ITEM', 20, y+8); doc.text('PRICE/PP', 130, y+8); doc.text('SUBTOTAL/PP', 190, y+8,{align:'right'});
+  y += 14;
+  doc.setDrawColor(230,222,212); doc.line(20,y,190,y);
+  y += 6;
+
+  let perPerson = 0;
+  const items = o.items || [];
+  items.forEach(item => {
+    const sub = item.price * (item.qty||1);
+    perPerson += sub;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(40,35,30);
+    doc.text(`${item.name} ×${item.qty||1}`, 20, y);
+    doc.setTextColor(120,110,100); doc.setFontSize(8);
+    doc.text(`$${item.price}`, 130, y);
+    doc.text(`$${sub}`, 190, y, {align:'right'});
+    y += 8;
+    if (y > 260) { doc.addPage(); y = 20; }
+  });
+
+  y += 4;
+  doc.setDrawColor(224,216,206); doc.line(20,y,190,y); y += 10;
+
+  // Totals block
+  doc.setFillColor(38,32,28); doc.roundedRect(20, y, 170, 40, 3, 3, 'F');
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(140,130,120);
+  doc.text('Per person subtotal', 28, y+10);
+  doc.text(`$${perPerson}/pp`, 185, y+10, {align:'right'});
+  doc.text(`Guest count`, 28, y+18);
+  doc.text(`× ${o.guests}`, 185, y+18, {align:'right'});
+  doc.setDrawColor(60,55,50); doc.line(28, y+22, 182, y+22);
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(212,168,67);
+  doc.text('Total', 28, y+31);
+  doc.text(`$${(o.total||0).toLocaleString()}`, 185, y+31, {align:'right'});
+  y += 48;
+
+  // Deposit notice
+  doc.setFillColor(184,134,11,0.1); doc.setDrawColor(184,134,11);
+  doc.roundedRect(20, y, 170, 14, 2, 2, 'FD');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(184,134,11);
+  doc.text('💵  30% Cash Deposit Due', 28, y+9);
+  doc.text(`$${(o.deposit||0).toLocaleString()}`, 185, y+9, {align:'right'});
+  y += 22;
+
+  // Notes
+  if (o.notes && o.notes.trim()) {
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(26,23,20);
+    doc.text('Special Requests', 20, y); y += 7;
+    doc.setFont('helvetica','normal'); doc.setTextColor(100,90,80); doc.setFontSize(8);
+    const noteLines = doc.splitTextToSize(o.notes, 170);
+    doc.text(noteLines, 20, y);
+    y += noteLines.length * 5 + 6;
+  }
+
+  // Footer
+  doc.setFontSize(8); doc.setTextColor(160,152,144); doc.setFont('helvetica','normal');
+  doc.text('Thank you for choosing 5th Element Indian Grill. We look forward to serving you.', 105, 287, {align:'center'});
+  doc.text('Cash payment only. Deposit due upon confirmation. Balance due 72 hours before event.', 105, 292, {align:'center'});
+
+  doc.save(`Order-${o.ref}.pdf`);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+loadOrder();
+</script>
+</body>
+</html>
