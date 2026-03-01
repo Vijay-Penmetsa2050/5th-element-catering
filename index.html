@@ -270,19 +270,22 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
           <div class="section-title">📅 Event Details</div>
           <div class="form-row">
             <div class="form-group"><label>Event Date *</label><input type="date" id="eventDate"></div>
-            <div class="form-group"><label>Event Time</label><input type="time" id="eventTime"></div>
+            <div class="form-group"><label>Event Time *</label><input type="time" id="eventTime"></div>
           </div>
-          <div class="form-group"><label>Venue / Address *</label><input type="text" id="venue" placeholder="123 Main St, City, State"></div>
           <div class="form-row">
             <div class="form-group"><label>Guest Count *</label><input type="number" id="guestCount" placeholder="50" min="1" oninput="updateCheckoutSummary()"></div>
             <div class="form-group">
-              <label>Budget Range</label>
-              <select id="budget">
+              <label>Order Type *</label>
+              <select id="orderType" onchange="handleOrderTypeChange()">
                 <option value="">Select...</option>
-                <option>$500–$1,000</option><option>$1,000–$2,500</option>
-                <option>$2,500–$5,000</option><option>$5,000–$10,000</option><option>$10,000+</option>
+                <option value="Delivery">Delivery</option>
+                <option value="Pickup">Pickup</option>
               </select>
             </div>
+          </div>
+          <div class="form-group" id="venue-group" style="display:none;">
+            <label id="venue-label">Delivery Address *</label>
+            <input type="text" id="venue" placeholder="123 Main St, City, State">
           </div>
           <div class="form-group">
             <label>Event Type</label>
@@ -308,26 +311,21 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
           <div class="summary-deposit">30% deposit due today: <strong id="checkout-deposit">—</strong></div>
         </div>
         <div class="form-section">
-          <div class="section-title">💳 Payment</div>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">A 30% deposit confirms your booking. Balance due 72 hrs before the event.</p>
-          <div class="payment-opt selected" id="pay-card" onclick="selectPayment('card')">
-            <div class="pay-radio"></div>
-            <div><div class="pay-label">Credit / Debit Card</div><div class="pay-sub">Visa, Mastercard, Amex, Discover</div></div>
-          </div>
-          <div class="payment-opt" id="pay-invoice" onclick="selectPayment('invoice')">
-            <div class="pay-radio"></div>
-            <div><div class="pay-label">Pay by Invoice</div><div class="pay-sub">We'll send an invoice within 24 hours</div></div>
-          </div>
-          <div id="cc-form">
-            <div class="cc-fields">
-              <div class="form-group full"><label>Cardholder Name</label><input type="text" id="cardName" placeholder="Jane Smith"></div>
-              <div class="form-group full"><label>Card Number</label><input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCard(this)"></div>
-              <div class="form-group"><label>Expiration</label><input type="text" id="cardExp" placeholder="MM / YY" maxlength="7" oninput="formatExp(this)"></div>
-              <div class="form-group"><label>CVV</label><input type="text" id="cardCVV" placeholder="123" maxlength="4"></div>
+          <div class="section-title">💵 Payment</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">We accept <strong>cash payments only</strong>. A 30% deposit is required to confirm your booking, with the balance due 72 hours before the event.</p>
+          <div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:18px;display:flex;align-items:center;gap:14px;">
+            <div style="font-size:28px;">💵</div>
+            <div>
+              <div style="font-size:14px;font-weight:500;margin-bottom:3px;">Cash Payment</div>
+              <div style="font-size:12px;color:var(--muted);">Our team will contact you to arrange deposit collection.</div>
             </div>
           </div>
+          <div style="margin-top:16px;background:var(--cream);border-radius:6px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;"><span>Order Total</span><span id="confirm-total-display">—</span></div>
+            <div style="display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);"><span>30% Deposit Due</span><span id="confirm-deposit-display">—</span></div>
+          </div>
         </div>
-        <button class="submit-btn" id="submit-btn" onclick="submitOrder()">✦ Confirm Order & Pay Deposit</button>
+        <button class="submit-btn" id="submit-btn" onclick="submitOrder()">✦ Confirm Order</button>
         <div style="margin-top:10px;"><button class="btn-back" onclick="goToCheckoutStep(2)" style="width:100%;">← Back</button></div>
       </div>
     </div>
@@ -338,13 +336,21 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
     <div class="success-screen">
       <div class="success-icon">🎉</div>
       <h2>Order Confirmed!</h2>
-      <p>Your catering order has been received. A confirmation has been sent to <strong id="confirm-email"></strong>.</p>
+      <p>Your catering order has been received. When Twilio is set up, an invoice link will be sent to <strong id="confirm-phone"></strong> via SMS.</p>
       <div class="success-ref">
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;">Order Reference</div>
         <div class="ref-num" id="ref-num"></div>
       </div>
+      <div style="background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:20px;text-align:left;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:8px;">Your Order Link</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:var(--gold);word-break:break-all;flex:1;" id="order-link-display"></div>
+          <button onclick="copyOrderLink()" style="background:var(--charcoal);color:var(--warm-white);border:none;padding:6px 12px;border-radius:4px;font-size:11px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;" id="copy-btn">Copy Link</button>
+        </div>
+      </div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="pdf-btn" onclick="downloadQuote()">⬇ Download Quote</button>
+        <button class="pdf-btn" onclick="downloadQuote()">⬇ Download PDF</button>
+        <a id="view-order-link" href="#" target="_blank" class="pdf-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">View Order Page</a>
         <button class="btn-primary" onclick="resetAll()">Place New Order</button>
       </div>
     </div>
@@ -539,7 +545,7 @@ const MENU_ITEMS = [
 let cart = {};
 let currentOrder = null;
 let orders = [];
-let paymentMethod = 'card';
+
 let currentCheckoutStep = 1;
 let currentUser = null; // { phone, name, email, is_admin }
 let authPhoneValue = ''; // phone from step 1 of auth modal
@@ -915,10 +921,27 @@ function validateStep1() {
   return true;
 }
 
+function handleOrderTypeChange() {
+  const type = document.getElementById('orderType').value;
+  const venueGroup = document.getElementById('venue-group');
+  venueGroup.style.display = type ? 'block' : 'none';
+  document.getElementById('venue-label').textContent = type === 'Delivery' ? 'Delivery Address *' : 'Pickup Notes (optional)';
+  if (type === 'Pickup') {
+    document.getElementById('venue').placeholder = 'Any notes for pickup (optional)';
+  } else {
+    document.getElementById('venue').placeholder = '123 Main St, City, State';
+  }
+}
+
 function validateStep2() {
   if (!document.getElementById('eventDate').value) { showToast('Event date is required'); return false; }
-  if (!document.getElementById('venue').value.trim()) { showToast('Venue is required'); return false; }
+  if (!document.getElementById('eventTime').value) { showToast('Event time is required'); return false; }
   if (!parseInt(document.getElementById('guestCount').value)) { showToast('Guest count is required'); return false; }
+  const orderType = document.getElementById('orderType').value;
+  if (!orderType) { showToast('Please select Delivery or Pickup'); return false; }
+  if (orderType === 'Delivery' && !document.getElementById('venue').value.trim()) {
+    showToast('Delivery address is required'); return false;
+  }
   return true;
 }
 
@@ -931,26 +954,19 @@ function updateCheckoutSummary() {
     return `<div class="summary-item"><span>${item.name} ×${qty}</span><span>$${item.price * qty}/pp</span></div>`;
   }).join('');
   const total = perPerson * guests;
+  const deposit = Math.round(total * 0.3);
   document.getElementById('checkout-summary-items').innerHTML = rows;
   document.getElementById('checkout-total').textContent = `$${total.toLocaleString()}`;
-  document.getElementById('checkout-deposit').textContent = `$${Math.round(total * 0.3).toLocaleString()}`;
+  document.getElementById('checkout-deposit').textContent = `$${deposit.toLocaleString()}`;
+  // Also update payment step display
+  const ct = document.getElementById('confirm-total-display');
+  const cd = document.getElementById('confirm-deposit-display');
+  if (ct) ct.textContent = `$${total.toLocaleString()}`;
+  if (cd) cd.textContent = `$${deposit.toLocaleString()}`;
 }
-
-function selectPayment(type) {
-  paymentMethod = type;
-  document.getElementById('pay-card').classList.toggle('selected', type === 'card');
-  document.getElementById('pay-invoice').classList.toggle('selected', type === 'invoice');
-  document.getElementById('cc-form').style.display = type === 'card' ? 'block' : 'none';
-}
-
-function formatCard(el) { el.value = el.value.replace(/\D/g,'').replace(/(\d{4})(?=\d)/g,'$1 '); }
-function formatExp(el) { el.value = el.value.replace(/\D/g,'').replace(/(\d{2})(?=\d)/g,'$1 / '); }
 
 // ── SUBMIT ORDER ─────────────────────────────────────────────────
 async function submitOrder() {
-  if (paymentMethod === 'card' && (!document.getElementById('cardName').value || !document.getElementById('cardNumber').value)) {
-    showToast('Please complete card details'); return;
-  }
   const btn = document.getElementById('submit-btn');
   btn.textContent = 'Saving…'; btn.disabled = true;
 
@@ -958,6 +974,7 @@ async function submitOrder() {
   const name = `${document.getElementById('firstName').value.trim()} ${document.getElementById('lastName').value.trim()}`;
   const email = document.getElementById('email').value.trim();
   const guests = parseInt(document.getElementById('guestCount').value);
+  const orderType = document.getElementById('orderType').value;
   const perPerson = Object.entries(cart).reduce((s, [id, qty]) => {
     const item = MENU_ITEMS.find(m => m.id === id); return s + (item ? item.price * qty : 0);
   }, 0);
@@ -969,33 +986,37 @@ async function submitOrder() {
     ref, name, email, phone,
     event_date: document.getElementById('eventDate').value,
     event_time: document.getElementById('eventTime').value,
-    venue: document.getElementById('venue').value,
-    guests, budget: document.getElementById('budget').value,
+    venue: document.getElementById('venue').value || '',
+    guests,
+    budget: orderType, // storing order type in budget column
     event_type: document.getElementById('eventType').value,
     notes: document.getElementById('notes').value,
     items: cartItems, total,
     deposit: Math.round(total * 0.3),
-    payment_method: paymentMethod,
-    status: paymentMethod === 'card' ? 'Paid' : 'Pending',
+    payment_method: 'cash',
+    status: 'Pending',
     customer_phone: phone,
   };
 
   try {
-    // Upsert customer (update name/email if changed, preserve password & is_admin)
     await db.upsert('customers', { phone, name, email, updated_at: new Date().toISOString() }, 'phone');
     const saved = await db.insert('orders', orderData);
-    currentOrder = { ...orderData, date: orderData.event_date, time: orderData.event_time, eventType: orderData.event_type, paymentMethod: orderData.payment_method, createdAt: saved.created_at };
+    currentOrder = { ...orderData, date: orderData.event_date, time: orderData.event_time, eventType: orderData.event_type, paymentMethod: 'cash', createdAt: saved.created_at };
     document.getElementById('checkout-section').style.display = 'none';
     document.getElementById('success-section').style.display = 'block';
-    document.getElementById('confirm-email').textContent = email;
+    document.getElementById('confirm-phone').textContent = phone;
     document.getElementById('ref-num').textContent = ref;
+    // Build shareable order link
+    const orderUrl = `${window.location.origin}${window.location.pathname.replace('index.html','').replace(/\/$/, '')}/order.html?ref=${ref}`;
+    document.getElementById('order-link-display').textContent = orderUrl;
+    document.getElementById('view-order-link').href = orderUrl;
     showToast('✓ Order confirmed!');
     window.scrollTo(0, 0);
   } catch(err) {
     console.error(err);
     showToast('⚠ Error: ' + (err.message || 'Please try again'));
   } finally {
-    btn.textContent = '✦ Confirm Order & Pay Deposit'; btn.disabled = false;
+    btn.textContent = '✦ Confirm Order'; btn.disabled = false;
   }
 }
 
@@ -1004,6 +1025,7 @@ function resetAll() {
   document.getElementById('success-section').style.display = 'none';
   document.getElementById('menu-section').style.display = 'block';
   document.querySelectorAll('#checkout-section input, #checkout-section select, #checkout-section textarea').forEach(el => el.value = '');
+  document.getElementById('venue-group').style.display = 'none';
   renderMenu(); updateCartUI();
   window.scrollTo(0, 0);
 }
@@ -1038,7 +1060,7 @@ function downloadQuote() {
   doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(184,134,11);
   doc.text('TOTAL',20,y); doc.text(`$${o.total.toLocaleString()}`,190,y,{align:'right'});
   y+=9; doc.setFontSize(9); doc.setTextColor(100,90,80);
-  doc.text(`30% Deposit (${o.paymentMethod==='card'?'Paid':'Invoice Pending'})`,20,y);
+  doc.text(`30% Deposit Due (Cash)`,20,y);
   doc.text(`$${o.deposit.toLocaleString()}`,190,y,{align:'right'});
   if (o.notes) {
     y+=14; doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.text('Notes',20,y);
@@ -1173,6 +1195,17 @@ function exportCSV() {
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
   a.download = 'catering-orders.csv'; a.click();
+}
+
+function copyOrderLink() {
+  const link = document.getElementById('order-link-display').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Link', 2000);
+  }).catch(() => {
+    showToast('Could not copy — please copy the link manually');
+  });
 }
 
 function showToast(msg) {
