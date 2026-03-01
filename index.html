@@ -52,21 +52,39 @@ nav{background:var(--charcoal);padding:0 24px;display:flex;align-items:center;ju
 .menu-back-btn:hover{border-color:var(--charcoal);color:var(--charcoal);}
 .menu-page-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;}
 .menu-page-sub{color:var(--muted);font-size:13px;margin-bottom:28px;margin-top:4px;}
-.cat-section{margin-bottom:32px;}
-.cat-heading{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);font-weight:500;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;}
-.menu-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:8px;padding:16px;transition:all 0.18s;}
-.menu-card:hover{border-color:var(--gold);box-shadow:0 2px 12px rgba(184,134,11,0.08);}
-.menu-card.in-cart{border-color:var(--gold);background:rgba(184,134,11,0.04);}
-.menu-card-cat{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;}
-.menu-card-name{font-size:15px;font-weight:500;margin-bottom:4px;}
-.menu-card-desc{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.4;}
-.menu-card-footer{display:flex;align-items:center;justify-content:space-between;}
-.menu-card-price{font-size:13px;color:var(--gold);font-weight:500;}
+.menu-loading{text-align:center;padding:60px 20px;color:var(--muted);}
+.menu-spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.cat-section{margin-bottom:36px;}
+.cat-heading{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);font-weight:500;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
+
+/* Tray-based menu card */
+.menu-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:10px;padding:18px;transition:border-color 0.18s;}
+.menu-card:hover{border-color:rgba(184,134,11,0.4);}
+.menu-card.in-cart{border-color:var(--gold);background:rgba(184,134,11,0.03);}
+.menu-card-header{margin-bottom:12px;}
+.menu-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px;}
+.menu-card-name{font-size:15px;font-weight:500;}
+.veg-badge{display:inline-block;width:16px;height:16px;border:1.5px solid var(--sage);border-radius:3px;position:relative;flex-shrink:0;margin-top:2px;}
+.veg-badge::after{content:'';position:absolute;inset:3px;background:var(--sage);border-radius:50%;}
+.menu-card-desc{font-size:12px;color:var(--muted);line-height:1.45;}
+.tray-rows{display:flex;flex-direction:column;gap:6px;}
+.tray-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;background:var(--cream);border:1px solid var(--border);transition:all 0.15s;}
+.tray-row.has-qty{background:rgba(184,134,11,0.05);border-color:var(--gold);}
+.tray-label{flex:1;}
+.tray-name{font-size:12px;font-weight:500;color:var(--charcoal);}
+.tray-price{font-size:11px;color:var(--gold);}
+.tray-qty-ctrl{display:flex;align-items:center;gap:6px;}
+.tray-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);flex-shrink:0;}
+.tray-btn:hover{border-color:var(--gold);color:var(--gold);}
+.tray-qty{font-size:13px;font-weight:500;min-width:14px;text-align:center;}
+
+/* Cart items for tray model */
 .qty-control{display:flex;align-items:center;gap:8px;}
-.qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);}
 .qty-btn:hover{border-color:var(--gold);color:var(--gold);}
-.qty-num{font-size:14px;font-weight:500;min-width:16px;text-align:center;}
+.qty-num{font-size:13px;font-weight:500;min-width:14px;text-align:center;}
 
 /* ── CART SIDEBAR ── */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;opacity:0;pointer-events:none;transition:opacity 0.25s;}
@@ -273,7 +291,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
             <div class="form-group"><label>Event Time *</label><input type="time" id="eventTime"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label>Guest Count *</label><input type="number" id="guestCount" placeholder="50" min="1" oninput="updateCheckoutSummary()"></div>
+            <div class="form-group"><label>Guest Count</label><input type="number" id="guestCount" placeholder="50" min="1" oninput="updateCheckoutSummary()"></div>
             <div class="form-group">
               <label>Order Type *</label>
               <select id="orderType" onchange="handleOrderTypeChange()">
@@ -307,8 +325,8 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
         <div class="form-section">
           <div class="section-title">🧾 Order Summary</div>
           <div class="order-summary-items" id="checkout-summary-items"></div>
-          <div class="summary-total"><span>Total Estimate</span><span id="checkout-total">—</span></div>
-          <div class="summary-deposit">30% deposit due today: <strong id="checkout-deposit">—</strong></div>
+          <div class="summary-total"><span>Order Total</span><span id="checkout-total">—</span></div>
+          <div class="summary-deposit">30% cash deposit: <strong id="checkout-deposit">—</strong></div>
         </div>
         <div class="form-section">
           <div class="section-title">💵 Payment</div>
@@ -397,9 +415,8 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   </div>
   <div class="cart-items" id="cart-items-list"></div>
   <div class="cart-footer">
-    <div class="cart-total-row"><span>Per person subtotal</span><span id="cart-per-person">$0/pp</span></div>
-    <div class="cart-grand"><span>Est. Total</span><span id="cart-grand-total">—</span></div>
-    <div class="cart-note">* Final total calculated at checkout based on guest count</div>
+    <div class="cart-grand"><span>Order Total</span><span id="cart-grand-total">$0</span></div>
+    <div class="cart-note">* 30% deposit required to confirm booking</div>
     <button class="checkout-btn" id="checkout-btn" onclick="startCheckout()" disabled>Proceed to Checkout →</button>
   </div>
 </div>
@@ -519,36 +536,25 @@ const db = {
   }
 };
 
-// ── MENU DATA ────────────────────────────────────────────────────
-const MENU_ITEMS = [
-  {id:'app1',name:'Samosa Chaat',desc:'Crispy samosas, chickpeas, tamarind & mint chutney',price:8,cat:'Appetizer'},
-  {id:'app2',name:'Paneer Tikka',desc:'Marinated cottage cheese grilled in tandoor (V)',price:10,cat:'Appetizer'},
-  {id:'app3',name:'Chicken Seekh Kebab',desc:'Minced chicken with herbs, served with raita',price:12,cat:'Appetizer'},
-  {id:'app4',name:'Vegetable Pakora Station',desc:'Assorted fritters with chutneys (V)',price:7,cat:'Appetizer'},
-  {id:'bre1',name:'Tandoori Roti',desc:'Whole wheat bread from the clay oven (V)',price:3,cat:'Bread'},
-  {id:'bre2',name:'Garlic Naan',desc:'Leavened bread with garlic & butter (V)',price:4,cat:'Bread'},
-  {id:'ent1',name:'Butter Chicken',desc:'Tender chicken in a rich tomato-cream sauce',price:18,cat:'Entrée'},
-  {id:'ent2',name:'Lamb Rogan Josh',desc:'Slow-cooked Kashmiri lamb with aromatic spices',price:24,cat:'Entrée'},
-  {id:'ent3',name:'Palak Paneer',desc:'Fresh spinach with cottage cheese & spices (V)',price:16,cat:'Entrée'},
-  {id:'ent4',name:'Dal Makhani',desc:'Black lentils slow-cooked overnight, cream & butter (V)',price:14,cat:'Entrée'},
-  {id:'ent5',name:'Chicken Biryani',desc:'Fragrant basmati rice layered with spiced chicken',price:20,cat:'Entrée'},
-  {id:'ent6',name:'Prawn Masala',desc:'Prawns in a tangy onion-tomato gravy',price:26,cat:'Entrée'},
-  {id:'sid1',name:'Jeera Rice',desc:'Basmati rice tempered with cumin (V)',price:5,cat:'Side'},
-  {id:'sid2',name:'Raita',desc:'Yogurt with cucumber, cumin & mint (V)',price:4,cat:'Side'},
-  {id:'sid3',name:'Mixed Pickle & Chutneys',desc:'Mango pickle, tamarind & mint chutneys (V)',price:3,cat:'Side'},
-  {id:'des1',name:'Gulab Jamun',desc:'Soft milk-solid dumplings in rose syrup (V)',price:7,cat:'Dessert'},
-  {id:'des2',name:'Mango Kulfi',desc:'Traditional Indian ice cream, cardamom & pistachio (V)',price:8,cat:'Dessert'},
-  {id:'des3',name:'Rasmalai',desc:'Cottage cheese patties in saffron-cardamom cream (V)',price:9,cat:'Dessert'},
+// ── MENU DATA (loaded from DB) ────────────────────────────────────
+let MENU_ITEMS = [];
+
+const TRAY_SIZES = [
+  { key:'small',        label:'Small',        priceKey:'price_small' },
+  { key:'medium',       label:'Medium',       priceKey:'price_medium' },
+  { key:'medium_large', label:'Medium Large', priceKey:'price_medium_large' },
+  { key:'large',        label:'Large',        priceKey:'price_large' },
 ];
+
+// cart key = 'itemId::trayKey'  →  { item, tray, qty, price }
 
 // ── STATE ────────────────────────────────────────────────────────
 let cart = {};
 let currentOrder = null;
 let orders = [];
-
 let currentCheckoutStep = 1;
-let currentUser = null; // { phone, name, email, is_admin }
-let authPhoneValue = ''; // phone from step 1 of auth modal
+let currentUser = null;
+let authPhoneValue = '';
 
 // ── NAV RENDERING ────────────────────────────────────────────────
 function renderNav() {
@@ -570,7 +576,7 @@ function renderNav() {
 
 function updateCartCount() {
   const el = document.getElementById('cart-count');
-  if (el) el.textContent = Object.values(cart).reduce((s,q)=>s+q,0);
+  if (el) el.textContent = Object.values(cart).reduce((s,e)=>s+e.qty,0);
 }
 
 // ── AUTH MODAL ───────────────────────────────────────────────────
@@ -777,16 +783,14 @@ function showView(id) {
   window.scrollTo(0, 0);
 }
 
-function goHome() {
-  showView('landing-view');
-}
+function goHome() { showView('landing-view'); }
 
 function startOrdering() {
   showView('order-view');
   document.getElementById('menu-section').style.display = 'block';
   document.getElementById('checkout-section').style.display = 'none';
   document.getElementById('success-section').style.display = 'none';
-  renderMenu();
+  loadMenu();
   if (currentUser) prefillCheckoutFromUser();
 }
 
@@ -796,79 +800,124 @@ function showAdminView() {
   renderAdmin();
 }
 
-// ── MENU ─────────────────────────────────────────────────────────
+// ── LOAD MENU FROM DB ─────────────────────────────────────────────
+async function loadMenu() {
+  document.getElementById('menu-categories').innerHTML = `
+    <div class="menu-loading"><div class="menu-spinner"></div><div style="font-size:14px;">Loading menu…</div></div>`;
+  try {
+    const items = await db.select('menu_items', 'is_available=eq.true&order=sort_order.asc,name.asc');
+    MENU_ITEMS = items;
+    renderMenu();
+  } catch(err) {
+    document.getElementById('menu-categories').innerHTML = `
+      <div class="menu-loading">
+        <div style="font-size:13px;color:var(--terracotta);">⚠ Could not load menu: ${err.message}</div>
+        <button onclick="loadMenu()" style="margin-top:12px;background:var(--gold);border:none;padding:8px 18px;border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;">Retry</button>
+      </div>`;
+  }
+}
+
+// ── RENDER MENU ───────────────────────────────────────────────────
 function renderMenu() {
-  const cats = [...new Set(MENU_ITEMS.map(i => i.cat))];
+  const cats = [...new Set(MENU_ITEMS.map(i => i.category))];
+  if (!cats.length) {
+    document.getElementById('menu-categories').innerHTML = `<div class="menu-loading" style="font-size:14px;color:var(--muted);">No menu items available.</div>`;
+    return;
+  }
   document.getElementById('menu-categories').innerHTML = cats.map(cat => {
-    const items = MENU_ITEMS.filter(i => i.cat === cat);
+    const items = MENU_ITEMS.filter(i => i.category === cat);
     return `<div class="cat-section">
       <div class="cat-heading">${cat}</div>
-      <div class="menu-grid">${items.map(item => `
-        <div class="menu-card ${cart[item.id] ? 'in-cart' : ''}" id="card-${item.id}">
-          <div class="menu-card-cat">${item.cat}</div>
-          <div class="menu-card-name">${item.name}</div>
-          <div class="menu-card-desc">${item.desc}</div>
-          <div class="menu-card-footer">
-            <div class="menu-card-price">$${item.price}/pp</div>
-            <div class="qty-control">
-              <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
-              <span class="qty-num" id="qty-${item.id}">${cart[item.id] || 0}</span>
-              <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
-            </div>
-          </div>
-        </div>`).join('')}
-      </div>
+      <div class="menu-grid">${items.map(renderMenuCard).join('')}</div>
     </div>`;
   }).join('');
 }
 
-function changeQty(id, delta) {
-  const next = Math.max(0, (cart[id] || 0) + delta);
-  if (next === 0) delete cart[id]; else cart[id] = next;
-  const qEl = document.getElementById(`qty-${id}`);
+function renderMenuCard(item) {
+  const hasAny = TRAY_SIZES.some(t => getQty(item.id, t.key) > 0);
+  const sizes = TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
+  return `<div class="menu-card ${hasAny?'in-cart':''}" id="card-${item.id}">
+    <div class="menu-card-header">
+      <div class="menu-card-top">
+        <div class="menu-card-name">${item.name}</div>
+        ${item.is_vegetarian ? '<div class="veg-badge" title="Vegetarian"></div>' : ''}
+      </div>
+      ${item.description ? `<div class="menu-card-desc">${item.description}</div>` : ''}
+    </div>
+    <div class="tray-rows">
+      ${sizes.map(t => {
+        const qty = getQty(item.id, t.key);
+        return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-${t.key}">
+          <div class="tray-label">
+            <div class="tray-name">${t.label}</div>
+            <div class="tray-price">$${item[t.priceKey]}</div>
+          </div>
+          <div class="tray-qty-ctrl">
+            <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',-1)">−</button>
+            <span class="tray-qty" id="tqty-${item.id}-${t.key}">${qty}</span>
+            <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',1)">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function getQty(itemId, trayKey) {
+  return cart[`${itemId}::${trayKey}`]?.qty || 0;
+}
+
+function changeTrayQty(itemId, trayKey, delta) {
+  const cartKey = `${itemId}::${trayKey}`;
+  const item = MENU_ITEMS.find(m => m.id === itemId);
+  if (!item) return;
+  const tray = TRAY_SIZES.find(t => t.key === trayKey);
+  const price = item[tray.priceKey];
+  const next = Math.max(0, (cart[cartKey]?.qty || 0) + delta);
+  if (next === 0) delete cart[cartKey];
+  else cart[cartKey] = { item, tray, qty: next, price };
+  const qEl = document.getElementById(`tqty-${itemId}-${trayKey}`);
   if (qEl) qEl.textContent = next;
-  const cEl = document.getElementById(`card-${id}`);
-  if (cEl) cEl.classList.toggle('in-cart', next > 0);
+  const rowEl = document.getElementById(`tray-row-${itemId}-${trayKey}`);
+  if (rowEl) rowEl.classList.toggle('has-qty', next > 0);
+  const hasAny = TRAY_SIZES.some(t => getQty(itemId, t.key) > 0);
+  const cardEl = document.getElementById(`card-${itemId}`);
+  if (cardEl) cardEl.classList.toggle('in-cart', hasAny);
   updateCartUI();
 }
 
 // ── CART ─────────────────────────────────────────────────────────
 function updateCartUI() {
-  const totalItems = Object.values(cart).reduce((s, q) => s + q, 0);
-  const perPerson = Object.entries(cart).reduce((s, [id, q]) => {
-    const item = MENU_ITEMS.find(m => m.id === id); return s + (item ? item.price * q : 0);
-  }, 0);
+  const entries = Object.values(cart);
+  const totalTrays = entries.reduce((s, e) => s + e.qty, 0);
+  const grandTotal = entries.reduce((s, e) => s + e.price * e.qty, 0);
   updateCartCount();
-  const ppEl = document.getElementById('cart-per-person');
-  if (ppEl) ppEl.textContent = `$${perPerson}/pp`;
   const gtEl = document.getElementById('cart-grand-total');
-  if (gtEl) gtEl.textContent = `$${perPerson}/pp × guests`;
+  if (gtEl) gtEl.textContent = `$${grandTotal.toLocaleString()}`;
   const btn = document.getElementById('checkout-btn');
-  if (btn) btn.disabled = totalItems === 0;
+  if (btn) btn.disabled = totalTrays === 0;
   renderCartItems();
 }
 
 function renderCartItems() {
   const el = document.getElementById('cart-items-list');
-  const entries = Object.entries(cart);
+  const entries = Object.values(cart);
   if (entries.length === 0) {
     el.innerHTML = `<div class="cart-empty"><div style="font-size:36px;margin-bottom:8px;">🍽️</div><p>Your cart is empty.<br>Add items from the menu.</p></div>`;
     return;
   }
-  el.innerHTML = entries.map(([id, qty]) => {
-    const item = MENU_ITEMS.find(m => m.id === id);
-    return `<div class="cart-item">
+  el.innerHTML = entries.map(e => `
+    <div class="cart-item">
       <div class="cart-item-info">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">$${item.price}/pp × ${qty}</div>
+        <div class="cart-item-name">${e.item.name}</div>
+        <div class="cart-item-price">${e.tray.label} tray · $${e.price} each</div>
       </div>
       <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty('${id}',-1)">−</button>
-        <span class="qty-num">${qty}</span>
-        <button class="qty-btn" onclick="changeQty('${id}',1)">+</button>
+        <button class="qty-btn" onclick="changeTrayQty('${e.item.id}','${e.tray.key}',-1)">−</button>
+        <span class="qty-num">${e.qty}</span>
+        <button class="qty-btn" onclick="changeTrayQty('${e.item.id}','${e.tray.key}',1)">+</button>
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 function openCart() {
@@ -936,7 +985,6 @@ function handleOrderTypeChange() {
 function validateStep2() {
   if (!document.getElementById('eventDate').value) { showToast('Event date is required'); return false; }
   if (!document.getElementById('eventTime').value) { showToast('Event time is required'); return false; }
-  if (!parseInt(document.getElementById('guestCount').value)) { showToast('Guest count is required'); return false; }
   const orderType = document.getElementById('orderType').value;
   if (!orderType) { showToast('Please select Delivery or Pickup'); return false; }
   if (orderType === 'Delivery' && !document.getElementById('venue').value.trim()) {
@@ -946,22 +994,28 @@ function validateStep2() {
 }
 
 function updateCheckoutSummary() {
-  const guests = parseInt(document.getElementById('guestCount')?.value) || 0;
-  let perPerson = 0;
-  const rows = Object.entries(cart).map(([id, qty]) => {
-    const item = MENU_ITEMS.find(m => m.id === id);
-    perPerson += item.price * qty;
-    return `<div class="summary-item"><span>${item.name} ×${qty}</span><span>$${item.price * qty}/pp</span></div>`;
-  }).join('');
-  const total = perPerson * guests;
-  const deposit = Math.round(total * 0.3);
-  document.getElementById('checkout-summary-items').innerHTML = rows;
-  document.getElementById('checkout-total').textContent = `$${total.toLocaleString()}`;
+  const entries = Object.values(cart);
+  const grandTotal = entries.reduce((s, e) => s + e.price * e.qty, 0);
+  const deposit = Math.round(grandTotal * 0.3);
+
+  // Group by item name for a clean grouped display
+  const grouped = {};
+  entries.forEach(e => {
+    if (!grouped[e.item.id]) grouped[e.item.id] = { name: e.item.name, lines: [] };
+    grouped[e.item.id].lines.push(`${e.tray.label} ×${e.qty} — $${(e.price * e.qty).toLocaleString()}`);
+  });
+
+  document.getElementById('checkout-summary-items').innerHTML = Object.values(grouped).map(g => `
+    <div class="summary-item" style="flex-direction:column;align-items:flex-start;gap:2px;padding:8px 0;">
+      <span style="font-weight:500;color:var(--charcoal);">${g.name}</span>
+      ${g.lines.map(l => `<span style="font-size:12px;color:var(--muted);padding-left:8px;">${l}</span>`).join('')}
+    </div>`).join('');
+
+  document.getElementById('checkout-total').textContent = `$${grandTotal.toLocaleString()}`;
   document.getElementById('checkout-deposit').textContent = `$${deposit.toLocaleString()}`;
-  // Also update payment step display
   const ct = document.getElementById('confirm-total-display');
   const cd = document.getElementById('confirm-deposit-display');
-  if (ct) ct.textContent = `$${total.toLocaleString()}`;
+  if (ct) ct.textContent = `$${grandTotal.toLocaleString()}`;
   if (cd) cd.textContent = `$${deposit.toLocaleString()}`;
 }
 
@@ -973,14 +1027,23 @@ async function submitOrder() {
   const phone = document.getElementById('phone').value.trim();
   const name = `${document.getElementById('firstName').value.trim()} ${document.getElementById('lastName').value.trim()}`;
   const email = document.getElementById('email').value.trim();
-  const guests = parseInt(document.getElementById('guestCount').value);
+  const guests = parseInt(document.getElementById('guestCount').value) || null;
   const orderType = document.getElementById('orderType').value;
-  const perPerson = Object.entries(cart).reduce((s, [id, qty]) => {
-    const item = MENU_ITEMS.find(m => m.id === id); return s + (item ? item.price * qty : 0);
-  }, 0);
-  const total = perPerson * guests;
+
+  const entries = Object.values(cart);
+  const grandTotal = entries.reduce((s, e) => s + e.price * e.qty, 0);
   const ref = 'CAT-' + Date.now().toString(36).toUpperCase().slice(-6);
-  const cartItems = Object.entries(cart).map(([id, qty]) => ({ ...MENU_ITEMS.find(m => m.id === id), qty }));
+
+  const cartItems = entries.map(e => ({
+    id: e.item.id,
+    name: e.item.name,
+    category: e.item.category,
+    tray_key: e.tray.key,
+    tray_label: e.tray.label,
+    price: e.price,
+    qty: e.qty,
+    subtotal: e.price * e.qty,
+  }));
 
   const orderData = {
     ref, name, email, phone,
@@ -988,11 +1051,12 @@ async function submitOrder() {
     event_time: document.getElementById('eventTime').value,
     venue: document.getElementById('venue').value || '',
     guests,
-    budget: orderType, // storing order type in budget column
+    budget: orderType,
     event_type: document.getElementById('eventType').value,
     notes: document.getElementById('notes').value,
-    items: cartItems, total,
-    deposit: Math.round(total * 0.3),
+    items: cartItems,
+    total: grandTotal,
+    deposit: Math.round(grandTotal * 0.3),
     payment_method: 'cash',
     status: 'Pending',
     customer_phone: phone,
@@ -1006,7 +1070,6 @@ async function submitOrder() {
     document.getElementById('success-section').style.display = 'block';
     document.getElementById('confirm-phone').textContent = phone;
     document.getElementById('ref-num').textContent = ref;
-    // Build shareable order link
     const orderUrl = `${window.location.origin}${window.location.pathname.replace('index.html','').replace(/\/$/, '')}/order.html?ref=${ref}`;
     document.getElementById('order-link-display').textContent = orderUrl;
     document.getElementById('view-order-link').href = orderUrl;
@@ -1026,7 +1089,7 @@ function resetAll() {
   document.getElementById('menu-section').style.display = 'block';
   document.querySelectorAll('#checkout-section input, #checkout-section select, #checkout-section textarea').forEach(el => el.value = '');
   document.getElementById('venue-group').style.display = 'none';
-  renderMenu(); updateCartUI();
+  loadMenu(); updateCartUI();
   window.scrollTo(0, 0);
 }
 
@@ -1035,41 +1098,55 @@ function downloadQuote() {
   if (!currentOrder) return;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF(); const o = currentOrder;
+  // Header band
   doc.setFillColor(26,23,20); doc.rect(0,0,210,50,'F');
   doc.setTextColor(212,168,67); doc.setFontSize(22); doc.setFont('helvetica','italic');
   doc.text('5th Element Indian Grill', 20, 27);
   doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(160,152,144);
-  doc.text('CATERING QUOTE', 20, 39); doc.text(o.ref, 190, 39, {align:'right'});
+  doc.text('CATERING ORDER', 20, 39); doc.text(o.ref, 190, 39, {align:'right'});
+  // Client + Event
   doc.setTextColor(26,23,20); doc.setFontSize(11); doc.setFont('helvetica','bold');
   doc.text('Client', 20, 66); doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.text(o.name,20,75); doc.text(o.email,20,82); doc.text(o.phone,20,89);
+  doc.text(o.name||'',20,75); doc.text(o.email||'',20,82); doc.text(o.phone||'',20,89);
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('Event',110,66);
   doc.setFont('helvetica','normal'); doc.setFontSize(9);
-  doc.text(`Date: ${o.date} ${o.time}`,110,75); doc.text(`Venue: ${o.venue}`,110,82);
-  doc.text(`Guests: ${o.guests}`,110,89); doc.text(`Type: ${o.eventType||'—'}`,110,96);
+  doc.text(`Date: ${o.date||''} at ${o.time||''}`,110,75);
+  doc.text(`Type: ${o.budget||'—'}`,110,82);
+  if (o.venue) doc.text(`Venue: ${o.venue}`,110,89);
+  if (o.guests) doc.text(`Guests: ${o.guests}`,110,96);
+  // Menu table
   doc.setDrawColor(224,216,206); doc.line(20,106,190,106);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text('Menu',20,118);
-  let y = 128;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(26,23,20);
+  doc.text('Menu',20,118);
+  doc.setFontSize(8); doc.setTextColor(184,134,11);
+  doc.text('ITEM', 20, 127); doc.text('TRAY', 115, 127); doc.text('QTY', 155, 127); doc.text('SUBTOTAL', 190, 127, {align:'right'});
+  let y = 133;
+  doc.setDrawColor(230,222,212); doc.line(20,y,190,y); y += 6;
   (o.items||[]).forEach(item => {
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
-    doc.text(`${item.name} ×${item.qty||1}`, 20, y);
-    doc.text(`$${item.price}/pp × ${o.guests} = $${item.price*o.guests}`, 190, y, {align:'right'});
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(40,35,30);
+    doc.text(String(item.name||''), 20, y);
+    doc.setTextColor(100,90,80);
+    doc.text(String(item.tray_label||item.tray?.label||''), 115, y);
+    doc.text(String(item.qty||1), 155, y);
+    doc.text(`$${(item.subtotal||item.price||0).toLocaleString()}`, 190, y, {align:'right'});
     y += 9;
+    if (y > 265) { doc.addPage(); y = 20; }
   });
-  doc.line(20,y+3,190,y+3); y+=12;
+  // Totals
+  doc.setDrawColor(224,216,206); doc.line(20,y+3,190,y+3); y += 12;
   doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(184,134,11);
-  doc.text('TOTAL',20,y); doc.text(`$${o.total.toLocaleString()}`,190,y,{align:'right'});
-  y+=9; doc.setFontSize(9); doc.setTextColor(100,90,80);
-  doc.text(`30% Deposit Due (Cash)`,20,y);
-  doc.text(`$${o.deposit.toLocaleString()}`,190,y,{align:'right'});
-  if (o.notes) {
-    y+=14; doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.text('Notes',20,y);
-    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text('TOTAL',20,y); doc.text(`$${(o.total||0).toLocaleString()}`,190,y,{align:'right'});
+  y += 9; doc.setFontSize(9); doc.setTextColor(100,90,80);
+  doc.text('30% Deposit Due (Cash)',20,y);
+  doc.text(`$${(o.deposit||0).toLocaleString()}`,190,y,{align:'right'});
+  if (o.notes && o.notes.trim()) {
+    y += 14; doc.setTextColor(26,23,20); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text('Notes',20,y); doc.setFont('helvetica','normal'); doc.setFontSize(9);
     doc.text(doc.splitTextToSize(o.notes,170),20,y+8);
   }
   doc.setFontSize(8); doc.setTextColor(160,152,144);
   doc.text('Thank you for choosing 5th Element Indian Grill. We look forward to serving you.',105,285,{align:'center'});
-  doc.save(`Quote-${o.ref}.pdf`);
+  doc.save(`Order-${o.ref}.pdf`);
 }
 
 // ── ADMIN DASHBOARD ──────────────────────────────────────────────
@@ -1174,7 +1251,7 @@ async function removeAdmin(phone) {
 
 function viewOrder(i) {
   const o = orders[i];
-  const items = (o.items||[]).map(m=>`  • ${m.name} ×${m.qty||1} ($${m.price}/pp)`).join('\n');
+  const items = (o.items||[]).map(m=>`  • ${m.name} — ${m.tray_label||''} ×${m.qty||1} ($${(m.subtotal||m.price||0).toLocaleString()})`).join('\n');
   alert(`ORDER: ${o.ref}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue}\nGuests: ${o.guests}\nType: ${o.event_type||'—'}\n\nMenu:\n${items}\n\nTotal: $${(o.total||0).toLocaleString()}\nDeposit: $${(o.deposit||0).toLocaleString()}\nPayment: ${o.payment_method}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
 }
 
