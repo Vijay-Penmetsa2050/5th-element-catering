@@ -178,7 +178,7 @@ nav{background:var(--charcoal);padding:0 20px;display:flex;align-items:center;ju
           <div class="info-label" id="od-venue-label">Venue</div>
           <div class="info-value" id="od-venue" style="font-size:13px;">—</div>
         </div>
-        <div class="info-row">
+        <div class="info-row" id="od-guests-row">
           <div class="info-label">Guests</div>
           <div class="info-value" id="od-guests">—</div>
         </div>
@@ -197,11 +197,10 @@ nav{background:var(--charcoal);padding:0 20px;display:flex;align-items:center;ju
 
     <!-- TOTALS -->
     <div class="totals-card">
-      <div class="totals-row"><span>Items (per person)</span><span id="od-per-person">—</span></div>
-      <div class="totals-row"><span>Guest Count</span><span id="od-guest-count">—</span></div>
+      <div id="od-tray-summary"></div>
       <hr class="totals-divider">
       <div class="totals-grand">
-        <span class="totals-grand-label">Total</span>
+        <span class="totals-grand-label">Order Total</span>
         <span class="totals-grand-value" id="od-total">—</span>
       </div>
       <div class="deposit-row">
@@ -322,30 +321,51 @@ function renderOrder(o) {
     document.getElementById('od-venue-row').style.display = 'none';
   }
 
-  document.getElementById('od-guests').textContent = `${o.guests} ${parseInt(o.guests) === 1 ? 'guest' : 'guests'}`;
+  if (o.guests) {
+    document.getElementById('od-guests').textContent = `${o.guests} ${parseInt(o.guests) === 1 ? 'guest' : 'guests'}`;
+  } else {
+    document.getElementById('od-guests-row').style.display = 'none';
+  }
 
   if (o.event_type && o.event_type !== o.budget) {
     document.getElementById('od-eventtype-row').style.display = 'block';
     document.getElementById('od-eventtype').textContent = o.event_type;
   }
 
-  // Menu items
+  // Menu items — support both tray model (tray_label) and legacy (price/pp)
   const items = o.items || [];
-  const perPerson = items.reduce((s, item) => s + (item.price * (item.qty || 1)), 0);
   document.getElementById('od-items').innerHTML = items.length === 0
     ? '<div style="color:var(--muted);font-size:13px;">No items recorded.</div>'
-    : items.map(item => `
-        <div class="menu-line">
+    : items.map(item => {
+        const isTray = !!item.tray_label;
+        const subtotal = item.subtotal || (item.price * (item.qty || 1));
+        const meta = isTray
+          ? `${item.tray_label} tray × ${item.qty || 1}`
+          : `$${item.price}/pp × ${item.qty || 1}`;
+        return `<div class="menu-line">
           <div class="menu-line-left">
             <div class="menu-line-name">${item.name}</div>
-            <div class="menu-line-meta">$${item.price}/pp × ${item.qty || 1} serving${(item.qty||1)>1?'s':''}</div>
+            <div class="menu-line-meta">${meta}</div>
           </div>
-          <div class="menu-line-price">$${(item.price * (item.qty||1))}/pp</div>
-        </div>`).join('');
+          <div class="menu-line-price">$${subtotal.toLocaleString()}</div>
+        </div>`;
+      }).join('');
+
+  // Tray summary rows (group by tray size for a clean breakdown)
+  const trayGroups = {};
+  items.forEach(item => {
+    if (item.tray_label) {
+      if (!trayGroups[item.tray_label]) trayGroups[item.tray_label] = { qty: 0, subtotal: 0 };
+      trayGroups[item.tray_label].qty += item.qty || 1;
+      trayGroups[item.tray_label].subtotal += item.subtotal || (item.price * (item.qty || 1));
+    }
+  });
+  const trayRows = Object.entries(trayGroups).map(([label, val]) =>
+    `<div class="totals-row"><span>${label} trays (×${val.qty})</span><span>$${val.subtotal.toLocaleString()}</span></div>`
+  ).join('');
+  document.getElementById('od-tray-summary').innerHTML = trayRows;
 
   // Totals
-  document.getElementById('od-per-person').textContent = `$${perPerson}/pp`;
-  document.getElementById('od-guest-count').textContent = `× ${o.guests}`;
   document.getElementById('od-total').textContent = `$${(o.total || 0).toLocaleString()}`;
   document.getElementById('od-deposit').textContent = `$${(o.deposit || 0).toLocaleString()}`;
 
@@ -418,21 +438,20 @@ function downloadPDF() {
   doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(26,23,20);
   doc.text('Menu Selection', 20, y);
   doc.setFontSize(8); doc.setTextColor(184,134,11);
-  doc.text('ITEM', 20, y+8); doc.text('PRICE/PP', 130, y+8); doc.text('SUBTOTAL/PP', 190, y+8,{align:'right'});
+  doc.text('ITEM', 20, y+8); doc.text('TRAY', 115, y+8); doc.text('QTY', 155, y+8); doc.text('SUBTOTAL', 190, y+8,{align:'right'});
   y += 14;
   doc.setDrawColor(230,222,212); doc.line(20,y,190,y);
   y += 6;
 
-  let perPerson = 0;
   const items = o.items || [];
   items.forEach(item => {
-    const sub = item.price * (item.qty||1);
-    perPerson += sub;
+    const subtotal = item.subtotal || (item.price * (item.qty||1));
     doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(40,35,30);
-    doc.text(`${item.name} ×${item.qty||1}`, 20, y);
+    doc.text(String(item.name||''), 20, y);
     doc.setTextColor(120,110,100); doc.setFontSize(8);
-    doc.text(`$${item.price}`, 130, y);
-    doc.text(`$${sub}`, 190, y, {align:'right'});
+    doc.text(String(item.tray_label || ''), 115, y);
+    doc.text(String(item.qty||1), 155, y);
+    doc.text(`$${subtotal.toLocaleString()}`, 190, y, {align:'right'});
     y += 8;
     if (y > 260) { doc.addPage(); y = 20; }
   });
@@ -441,17 +460,11 @@ function downloadPDF() {
   doc.setDrawColor(224,216,206); doc.line(20,y,190,y); y += 10;
 
   // Totals block
-  doc.setFillColor(38,32,28); doc.roundedRect(20, y, 170, 40, 3, 3, 'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(140,130,120);
-  doc.text('Per person subtotal', 28, y+10);
-  doc.text(`$${perPerson}/pp`, 185, y+10, {align:'right'});
-  doc.text(`Guest count`, 28, y+18);
-  doc.text(`× ${o.guests}`, 185, y+18, {align:'right'});
-  doc.setDrawColor(60,55,50); doc.line(28, y+22, 182, y+22);
+  doc.setFillColor(38,32,28); doc.roundedRect(20, y, 170, 24, 3, 3, 'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(212,168,67);
-  doc.text('Total', 28, y+31);
-  doc.text(`$${(o.total||0).toLocaleString()}`, 185, y+31, {align:'right'});
-  y += 48;
+  doc.text('Order Total', 28, y+15);
+  doc.text(`$${(o.total||0).toLocaleString()}`, 185, y+15, {align:'right'});
+  y += 32;
 
   // Deposit notice
   doc.setFillColor(184,134,11,0.1); doc.setDrawColor(184,134,11);
