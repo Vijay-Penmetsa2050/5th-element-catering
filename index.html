@@ -59,26 +59,51 @@ nav{background:var(--charcoal);padding:0 24px;display:flex;align-items:center;ju
 .cat-heading{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);font-weight:500;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;}
 
-/* Tray-based menu card */
-.menu-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:10px;padding:18px;transition:border-color 0.18s;}
+/* Tray-based menu card — collapsed by default */
+.menu-card{background:var(--warm-white);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.18s;}
 .menu-card:hover{border-color:rgba(184,134,11,0.4);}
-.menu-card.in-cart{border-color:var(--gold);background:rgba(184,134,11,0.03);}
-.menu-card-header{margin-bottom:12px;}
-.menu-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px;}
-.menu-card-name{font-size:15px;font-weight:500;}
-.veg-badge{display:inline-block;width:16px;height:16px;border:1.5px solid var(--sage);border-radius:3px;position:relative;flex-shrink:0;margin-top:2px;}
-.veg-badge::after{content:'';position:absolute;inset:3px;background:var(--sage);border-radius:50%;}
+.menu-card.in-cart{border-color:var(--gold);}
+.menu-card.expanded{border-color:var(--gold);box-shadow:0 4px 18px rgba(184,134,11,0.1);}
+
+/* Collapsed header — always visible, clickable */
+.menu-card-summary{padding:16px 18px;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;user-select:none;}
+.menu-card-summary:hover .menu-card-name{color:var(--gold);}
+.menu-card-left{flex:1;}
+.menu-card-name{font-size:15px;font-weight:500;transition:color 0.15s;margin-bottom:3px;}
 .menu-card-desc{font-size:12px;color:var(--muted);line-height:1.45;}
-.tray-rows{display:flex;flex-direction:column;gap:6px;}
-.tray-row{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;background:var(--cream);border:1px solid var(--border);transition:all 0.15s;}
-.tray-row.has-qty{background:rgba(184,134,11,0.05);border-color:var(--gold);}
+.menu-card-badges{display:flex;align-items:center;gap:6px;margin-top:5px;flex-wrap:wrap;}
+.in-cart-badge{font-size:10px;background:rgba(184,134,11,0.12);color:var(--gold);padding:2px 8px;border-radius:10px;font-weight:500;}
+.veg-badge{display:inline-block;width:16px;height:16px;border:1.5px solid var(--sage);border-radius:3px;position:relative;flex-shrink:0;}
+.veg-badge::after{content:'';position:absolute;inset:3px;background:var(--sage);border-radius:50%;}
+.menu-card-chevron{font-size:11px;color:var(--muted);transition:transform 0.2s;flex-shrink:0;margin-top:3px;}
+.menu-card.expanded .menu-card-chevron{transform:rotate(180deg);}
+
+/* Expanded tray panel */
+.menu-card-tray-panel{display:none;padding:0 18px 16px;border-top:1px solid var(--border);}
+.menu-card.expanded .menu-card-tray-panel{display:block;}
+.tray-panel-title{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);padding:12px 0 8px;font-weight:500;}
+.tray-rows{display:flex;flex-direction:column;gap:8px;}
+.tray-row{border-radius:8px;background:var(--cream);border:1px solid var(--border);transition:all 0.15s;overflow:hidden;}
+.tray-row.has-qty{background:rgba(184,134,11,0.04);border-color:var(--gold);}
+.tray-row-top{display:flex;align-items:center;gap:10px;padding:9px 12px;}
 .tray-label{flex:1;}
 .tray-name{font-size:12px;font-weight:500;color:var(--charcoal);}
 .tray-price{font-size:11px;color:var(--gold);}
 .tray-qty-ctrl{display:flex;align-items:center;gap:6px;}
-.tray-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);flex-shrink:0;}
+.tray-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);flex-shrink:0;}
 .tray-btn:hover{border-color:var(--gold);color:var(--gold);}
-.tray-qty{font-size:13px;font-weight:500;min-width:14px;text-align:center;}
+.tray-qty{font-size:13px;font-weight:500;min-width:16px;text-align:center;}
+
+/* Spicy level row — only shown when qty > 0 */
+.spicy-row{display:none;align-items:center;gap:8px;padding:7px 12px 10px;border-top:1px solid rgba(224,216,206,0.6);}
+.tray-row.has-qty .spicy-row{display:flex;}
+.spicy-label{font-size:11px;color:var(--muted);white-space:nowrap;}
+.spicy-ctrl{display:flex;align-items:center;gap:6px;margin-left:4px;}
+.spicy-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);flex-shrink:0;}
+.spicy-btn:hover{border-color:var(--terracotta);color:var(--terracotta);}
+.spicy-val{font-size:13px;font-weight:600;min-width:18px;text-align:center;}
+.spicy-indicator{display:flex;gap:2px;margin-left:6px;}
+.spicy-pip{width:6px;height:6px;border-radius:50%;background:var(--border);transition:background 0.15s;}
 
 /* Cart items for tray model */
 .qty-control{display:flex;align-items:center;gap:8px;}
@@ -836,35 +861,94 @@ function renderMenu() {
 function renderMenuCard(item) {
   const hasAny = TRAY_SIZES.some(t => getQty(item.id, t.key) > 0);
   const sizes = TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
+  const cartCount = Object.entries(cart)
+    .filter(([k]) => k.startsWith(item.id + '::'))
+    .reduce((s, [,e]) => s + e.qty, 0);
+
   return `<div class="menu-card ${hasAny?'in-cart':''}" id="card-${item.id}">
-    <div class="menu-card-header">
-      <div class="menu-card-top">
+    <div class="menu-card-summary" onclick="toggleCard('${item.id}')">
+      <div class="menu-card-left">
         <div class="menu-card-name">${item.name}</div>
-        ${item.is_vegetarian ? '<div class="veg-badge" title="Vegetarian"></div>' : ''}
+        ${item.description ? `<div class="menu-card-desc">${item.description}</div>` : ''}
+        <div class="menu-card-badges">
+          ${item.is_vegetarian ? '<div class="veg-badge" title="Vegetarian"></div>' : ''}
+          ${hasAny ? `<span class="in-cart-badge">✓ ${cartCount} in cart</span>` : ''}
+        </div>
       </div>
-      ${item.description ? `<div class="menu-card-desc">${item.description}</div>` : ''}
+      <div class="menu-card-chevron">▼</div>
     </div>
-    <div class="tray-rows">
-      ${sizes.map(t => {
-        const qty = getQty(item.id, t.key);
-        return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-${t.key}">
-          <div class="tray-label">
-            <div class="tray-name">${t.label}</div>
-            <div class="tray-price">$${item[t.priceKey]}</div>
-          </div>
-          <div class="tray-qty-ctrl">
-            <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',-1)">−</button>
-            <span class="tray-qty" id="tqty-${item.id}-${t.key}">${qty}</span>
-            <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',1)">+</button>
-          </div>
-        </div>`;
-      }).join('')}
+    <div class="menu-card-tray-panel" id="panel-${item.id}">
+      <div class="tray-panel-title">Select tray size & spice level</div>
+      <div class="tray-rows">
+        ${sizes.map(t => {
+          const qty = getQty(item.id, t.key);
+          const spicy = getSpicy(item.id, t.key);
+          return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-${t.key}">
+            <div class="tray-row-top">
+              <div class="tray-label">
+                <div class="tray-name">${t.label}</div>
+                <div class="tray-price">$${item[t.priceKey]}</div>
+              </div>
+              <div class="tray-qty-ctrl">
+                <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',-1);event.stopPropagation()">−</button>
+                <span class="tray-qty" id="tqty-${item.id}-${t.key}">${qty}</span>
+                <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',1);event.stopPropagation()">+</button>
+              </div>
+            </div>
+            <div class="spicy-row">
+              <span class="spicy-label">🌶 Spice level:</span>
+              <div class="spicy-ctrl">
+                <button class="spicy-btn" onclick="changeSpicy('${item.id}','${t.key}',-1);event.stopPropagation()">−</button>
+                <span class="spicy-val" id="spicy-${item.id}-${t.key}">${spicy}</span>
+                <button class="spicy-btn" onclick="changeSpicy('${item.id}','${t.key}',1);event.stopPropagation()">+</button>
+              </div>
+              <div class="spicy-indicator" id="spicy-pips-${item.id}-${t.key}">
+                ${renderSpicyPips(spicy)}
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
     </div>
   </div>`;
 }
 
+function renderSpicyPips(level) {
+  return Array.from({length:10}, (_,i) => {
+    const filled = i < level;
+    const color = level <= 3 ? '#6b9c5e' : level <= 6 ? '#d4a843' : '#c4623a';
+    return `<div class="spicy-pip" style="background:${filled ? color : 'var(--border)'}"></div>`;
+  }).join('');
+}
+
+function toggleCard(itemId) {
+  const card = document.getElementById(`card-${itemId}`);
+  const isExpanded = card.classList.contains('expanded');
+  // Close all other expanded cards
+  document.querySelectorAll('.menu-card.expanded').forEach(c => c.classList.remove('expanded'));
+  if (!isExpanded) card.classList.add('expanded');
+}
+
 function getQty(itemId, trayKey) {
   return cart[`${itemId}::${trayKey}`]?.qty || 0;
+}
+
+function getSpicy(itemId, trayKey) {
+  return cart[`${itemId}::${trayKey}`]?.spicy || 5;
+}
+
+function changeSpicy(itemId, trayKey, delta) {
+  const cartKey = `${itemId}::${trayKey}`;
+  if (!cart[cartKey]) return; // only works if tray is in cart
+  const cur = cart[cartKey].spicy || 5;
+  const next = Math.min(10, Math.max(1, cur + delta));
+  cart[cartKey].spicy = next;
+  const valEl = document.getElementById(`spicy-${itemId}-${trayKey}`);
+  if (valEl) valEl.textContent = next;
+  const pipsEl = document.getElementById(`spicy-pips-${itemId}-${trayKey}`);
+  if (pipsEl) pipsEl.innerHTML = renderSpicyPips(next);
+  // Update cart sidebar if open
+  renderCartItems();
 }
 
 function changeTrayQty(itemId, trayKey, delta) {
@@ -873,16 +957,45 @@ function changeTrayQty(itemId, trayKey, delta) {
   if (!item) return;
   const tray = TRAY_SIZES.find(t => t.key === trayKey);
   const price = item[tray.priceKey];
-  const next = Math.max(0, (cart[cartKey]?.qty || 0) + delta);
-  if (next === 0) delete cart[cartKey];
-  else cart[cartKey] = { item, tray, qty: next, price };
+  const cur = cart[cartKey];
+  const next = Math.max(0, (cur?.qty || 0) + delta);
+  if (next === 0) {
+    delete cart[cartKey];
+  } else {
+    cart[cartKey] = { item, tray, qty: next, price, spicy: cur?.spicy || 5 };
+  }
+  // Update qty display
   const qEl = document.getElementById(`tqty-${itemId}-${trayKey}`);
   if (qEl) qEl.textContent = next;
+  // Toggle tray row highlight + show/hide spicy row
   const rowEl = document.getElementById(`tray-row-${itemId}-${trayKey}`);
   if (rowEl) rowEl.classList.toggle('has-qty', next > 0);
+  // Update spicy pips for default level when first added
+  if (next > 0) {
+    const spicy = cart[cartKey].spicy;
+    const valEl = document.getElementById(`spicy-${itemId}-${trayKey}`);
+    if (valEl) valEl.textContent = spicy;
+    const pipsEl = document.getElementById(`spicy-pips-${itemId}-${trayKey}`);
+    if (pipsEl) pipsEl.innerHTML = renderSpicyPips(spicy);
+  }
+  // Update card border + in-cart badge
   const hasAny = TRAY_SIZES.some(t => getQty(itemId, t.key) > 0);
   const cardEl = document.getElementById(`card-${itemId}`);
-  if (cardEl) cardEl.classList.toggle('in-cart', hasAny);
+  if (cardEl) {
+    cardEl.classList.toggle('in-cart', hasAny);
+    // Refresh the badge count inside the summary
+    const badge = cardEl.querySelector('.menu-card-badges');
+    if (badge) {
+      const cartCount = Object.entries(cart)
+        .filter(([k]) => k.startsWith(itemId + '::'))
+        .reduce((s,[,e]) => s + e.qty, 0);
+      const existing = badge.querySelector('.in-cart-badge');
+      if (hasAny) {
+        if (existing) existing.textContent = `✓ ${cartCount} in cart`;
+        else badge.insertAdjacentHTML('beforeend', `<span class="in-cart-badge">✓ ${cartCount} in cart</span>`);
+      } else if (existing) existing.remove();
+    }
+  }
   updateCartUI();
 }
 
@@ -910,7 +1023,7 @@ function renderCartItems() {
     <div class="cart-item">
       <div class="cart-item-info">
         <div class="cart-item-name">${e.item.name}</div>
-        <div class="cart-item-price">${e.tray.label} tray · $${e.price} each</div>
+        <div class="cart-item-price">${e.tray.label} tray · $${e.price} · 🌶 ${e.spicy || 5}/10</div>
       </div>
       <div class="qty-control">
         <button class="qty-btn" onclick="changeTrayQty('${e.item.id}','${e.tray.key}',-1)">−</button>
@@ -1042,6 +1155,7 @@ async function submitOrder() {
     tray_label: e.tray.label,
     price: e.price,
     qty: e.qty,
+    spicy_level: e.spicy || 5,
     subtotal: e.price * e.qty,
   }));
 
