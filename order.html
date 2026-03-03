@@ -227,6 +227,7 @@ nav{background:var(--charcoal);padding:0 20px;display:flex;align-items:center;ju
     <!-- ACTIONS -->
     <div class="actions">
       <button class="btn-pdf" onclick="downloadPDF()">⬇ Download PDF</button>
+      <button class="btn-outline" onclick="printKitchen()">🍳 Print to Kitchen</button>
       <button class="btn-outline" onclick="window.print()">🖨️ Print</button>
       <a class="btn-outline" href="index.html">Place New Order</a>
     </div>
@@ -339,13 +340,18 @@ function renderOrder(o) {
     : items.map(item => {
         const isTray = !!item.tray_label;
         const subtotal = item.subtotal || (item.price * (item.qty || 1));
+        const spicy = item.spicy_level;
+        const spicyColor = !spicy ? null : spicy <= 3 ? '#6b9c5e' : spicy <= 6 ? '#d4a843' : '#c4623a';
         const meta = isTray
           ? `${item.tray_label} tray × ${item.qty || 1}`
           : `$${item.price}/pp × ${item.qty || 1}`;
         return `<div class="menu-line">
           <div class="menu-line-left">
             <div class="menu-line-name">${item.name}</div>
-            <div class="menu-line-meta">${meta}</div>
+            <div class="menu-line-meta" style="display:flex;align-items:center;gap:8px;">
+              <span>${meta}</span>
+              ${spicy ? `<span style="color:${spicyColor};font-weight:500;">🌶 ${spicy}/10</span>` : ''}
+            </div>
           </div>
           <div class="menu-line-price">$${subtotal.toLocaleString()}</div>
         </div>`;
@@ -490,6 +496,92 @@ function downloadPDF() {
   doc.text('Cash payment only. Deposit due upon confirmation. Balance due 72 hours before event.', 105, 292, {align:'center'});
 
   doc.save(`Order-${o.ref}.pdf`);
+}
+
+// ── PRINT TO KITCHEN ─────────────────────────────────────────────
+function printKitchen() {
+  if (!orderData) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const o = orderData;
+
+  // Header band
+  doc.setFillColor(26,23,20); doc.rect(0,0,210,38,'F');
+  doc.setTextColor(212,168,67); doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text('KITCHEN ORDER', 20, 18);
+  doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(160,152,144);
+  doc.text(o.ref, 190, 14, {align:'right'});
+  // Event info line
+  const dateStr = o.event_date ? new Date(o.event_date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
+  const timeStr = o.event_time ? (() => { const [h,m]=o.event_time.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; })() : '';
+  doc.setTextColor(200,184,138); doc.setFontSize(9);
+  doc.text(`${dateStr}${timeStr?' at '+timeStr:''}  ·  ${o.budget||''}${o.guests?' · '+o.guests+' guests':''}`, 20, 30);
+  doc.setTextColor(200,184,138);
+  doc.text(`Customer: ${o.name||''}  ·  ${o.phone||''}`, 190, 30, {align:'right'});
+
+  let y = 50;
+
+  // Column headers
+  doc.setFillColor(245,241,235); doc.rect(14, y-5, 182, 10, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(26,23,20);
+  doc.text('ITEM', 18, y+1);
+  doc.text('TRAY', 105, y+1);
+  doc.text('QTY', 145, y+1);
+  doc.text('SPICE', 175, y+1);
+  y += 10;
+
+  doc.setDrawColor(220,212,202); doc.line(14, y, 196, y);
+  y += 6;
+
+  const items = o.items || [];
+  items.forEach((item, idx) => {
+    const spicy = item.spicy_level;
+    const spicyText = spicy ? `${spicy}/10` : '—';
+    // Alternating row background
+    if (idx % 2 === 0) {
+      doc.setFillColor(252,250,247); doc.rect(14, y-5, 182, 10, 'F');
+    }
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(26,23,20);
+    doc.text(String(item.name||''), 18, y+1);
+    doc.setFontSize(9); doc.setTextColor(80,72,65);
+    doc.text(String(item.tray_label||'—'), 105, y+1);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(26,23,20);
+    doc.text(String(item.qty||1), 145, y+1);
+    // Spicy level with color
+    if (spicy) {
+      const r = spicy <= 3 ? 107 : spicy <= 6 ? 184 : 196;
+      const g = spicy <= 3 ? 156 : spicy <= 6 ? 134 : 98;
+      const b = spicy <= 3 ? 94  : spicy <= 6 ? 11  : 58;
+      doc.setTextColor(r, g, b);
+    } else {
+      doc.setTextColor(150,140,130);
+    }
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(spicyText, 175, y+1);
+    y += 12;
+    if (y > 270) { doc.addPage(); y = 20; }
+  });
+
+  doc.setDrawColor(200,192,182); doc.line(14, y, 196, y);
+  y += 8;
+
+  // Notes
+  if (o.notes && o.notes.trim()) {
+    doc.setFillColor(255,252,240); doc.roundedRect(14, y, 182, 22, 2, 2, 'F');
+    doc.setDrawColor(212,168,67); doc.roundedRect(14, y, 182, 22, 2, 2, 'D');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(184,134,11);
+    doc.text('SPECIAL REQUESTS:', 19, y+8);
+    doc.setFont('helvetica','normal'); doc.setTextColor(60,52,45);
+    const noteLines = doc.splitTextToSize(o.notes, 158);
+    doc.text(noteLines[0]||'', 19, y+16);
+    y += 28;
+  }
+
+  // Footer
+  doc.setFontSize(8); doc.setTextColor(160,152,144); doc.setFont('helvetica','normal');
+  doc.text('— Kitchen copy — no prices —', 105, 290, {align:'center'});
+
+  doc.save(`Kitchen-${o.ref}.pdf`);
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
