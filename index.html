@@ -281,6 +281,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 .icon-btn{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--border);background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:all 0.15s;flex-shrink:0;}
 .icon-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(244,168,0,0.08);}
 .icon-btn-confirm:hover{border-color:var(--sage);color:var(--sage);background:rgba(90,138,60,0.08);}
+.icon-btn-pay:hover{border-color:#6495ed;color:#6495ed;background:rgba(100,149,237,0.08);}
 
 /* ── EDIT ITEM ROWS ── */
 .edit-item-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
@@ -445,21 +446,20 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
           <div class="section-title">🧾 Order Summary</div>
           <div class="order-summary-items" id="checkout-summary-items"></div>
           <div class="summary-total"><span>Order Total</span><span id="checkout-total">—</span></div>
-          <div class="summary-deposit">30% cash deposit: <strong id="checkout-deposit">—</strong></div>
         </div>
         <div class="form-section">
           <div class="section-title">💵 Payment</div>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">We accept <strong>cash payments only</strong>. A 30% deposit is required to confirm your booking, with the balance due 72 hours before the event.</p>
-          <div style="background:rgba(184,134,11,0.06);border:1px solid rgba(184,134,11,0.2);border-radius:8px;padding:18px;display:flex;align-items:center;gap:14px;">
-            <div style="font-size:28px;">💵</div>
-            <div>
-              <div style="font-size:14px;font-weight:500;margin-bottom:3px;">Cash Payment</div>
-              <div style="font-size:12px;color:var(--muted);">Our team will contact you to arrange deposit collection.</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Payment is collected at delivery or pickup. We accept <strong>Cash</strong> or <strong>Zelle</strong>.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div id="pay-cash" class="payment-opt selected" onclick="selectPayMethod('Cash')">
+              <div class="pay-radio"></div><div><div class="pay-label">💵 Cash</div><div class="pay-sub">At delivery / pickup</div></div>
+            </div>
+            <div id="pay-zelle" class="payment-opt" onclick="selectPayMethod('Zelle')">
+              <div class="pay-radio"></div><div><div class="pay-label">📲 Zelle</div><div class="pay-sub">Digital transfer</div></div>
             </div>
           </div>
-          <div style="margin-top:16px;background:var(--cream);border-radius:6px;padding:14px;">
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;"><span>Order Total</span><span id="confirm-total-display">—</span></div>
-            <div style="display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);"><span>30% Deposit Due</span><span id="confirm-deposit-display">—</span></div>
+          <div style="background:var(--cream);border-radius:6px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);"><span>Order Total</span><span id="confirm-total-display">—</span></div>
           </div>
         </div>
         <button class="submit-btn" id="submit-btn" onclick="submitOrder()">✦ Confirm Order</button>
@@ -544,7 +544,6 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
   <div class="cart-items" id="cart-items-list"></div>
   <div class="cart-footer">
     <div class="cart-grand"><span>Order Total</span><span id="cart-grand-total">$0</span></div>
-    <div class="cart-note">* 30% deposit required to confirm booking</div>
     <button class="checkout-btn" id="checkout-btn" onclick="startCheckout()" disabled>Proceed to Checkout →</button>
   </div>
 </div>
@@ -620,6 +619,44 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ═══ PAY MODAL ═══ -->
+<div class="modal-overlay" id="pay-modal" style="display:none;">
+  <div class="modal-box" style="max-width:420px;width:100%;">
+    <div class="modal-title">Record Payment</div>
+    <div id="pay-modal-ref" style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:15px;margin-bottom:6px;"></div>
+    <div id="pay-modal-balance" style="margin-bottom:20px;"></div>
+
+    <div class="modal-input-wrap">
+      <label class="modal-label">Payment Method</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+        <div id="pmod-cash" class="payment-opt selected" onclick="selectPayModalMethod('Cash')" style="padding:12px;">
+          <div class="pay-radio"></div><div><div class="pay-label">💵 Cash</div></div>
+        </div>
+        <div id="pmod-zelle" class="payment-opt" onclick="selectPayModalMethod('Zelle')" style="padding:12px;">
+          <div class="pay-radio"></div><div><div class="pay-label">📲 Zelle</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-input-wrap">
+      <label class="modal-label">Amount Received ($)</label>
+      <input class="modal-input" id="pay-amount" type="number" min="0" step="0.01" placeholder="0.00" oninput="updatePayBalance()">
+    </div>
+    <div id="pay-new-balance" style="font-size:13px;color:var(--muted);margin-bottom:16px;min-height:20px;"></div>
+
+    <div class="modal-input-wrap">
+      <label class="modal-label">Notes (optional)</label>
+      <input class="modal-input" id="pay-notes" type="text" placeholder="e.g. Paid at event">
+    </div>
+
+    <div id="pay-modal-error" class="modal-error"></div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="modal-btn gold" id="pay-save-btn" onclick="savePayment()">Save Payment</button>
+      <button style="flex:none;padding:13px 20px;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;background:none;color:var(--muted);" onclick="closePayModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ EDIT ORDER MODAL ═══ -->
 <div class="modal-overlay" id="edit-modal" style="display:none;">
@@ -1380,13 +1417,13 @@ function validateStep2() {
 function updateCheckoutSummary() {
   const entries = Object.values(cart);
   const grandTotal = entries.reduce((s, e) => s + e.price * e.qty, 0);
-  const deposit = Math.round(grandTotal * 0.3);
 
   // Group by item name for a clean grouped display
   const grouped = {};
   entries.forEach(e => {
     if (!grouped[e.item.id]) grouped[e.item.id] = { name: e.item.name, lines: [] };
-    grouped[e.item.id].lines.push(`${e.tray.label} ×${e.qty} — $${(e.price * e.qty).toLocaleString()}`);
+    const lineLabel = e.tray.key === 'piece' ? `${e.qty} pcs` : `${e.tray.label} ×${e.qty}`;
+    grouped[e.item.id].lines.push(`${lineLabel} — $${(e.price * e.qty).toLocaleString()}`);
   });
 
   document.getElementById('checkout-summary-items').innerHTML = Object.values(grouped).map(g => `
@@ -1396,11 +1433,17 @@ function updateCheckoutSummary() {
     </div>`).join('');
 
   document.getElementById('checkout-total').textContent = `$${grandTotal.toLocaleString()}`;
-  document.getElementById('checkout-deposit').textContent = `$${deposit.toLocaleString()}`;
   const ct = document.getElementById('confirm-total-display');
-  const cd = document.getElementById('confirm-deposit-display');
   if (ct) ct.textContent = `$${grandTotal.toLocaleString()}`;
-  if (cd) cd.textContent = `$${deposit.toLocaleString()}`;
+}
+
+let selectedPayMethod = 'Cash';
+function selectPayMethod(method) {
+  selectedPayMethod = method;
+  document.getElementById('pay-cash').classList.toggle('selected', method === 'Cash');
+  document.getElementById('pay-zelle').classList.toggle('selected', method === 'Zelle');
+  document.getElementById('pay-cash').querySelector('.pay-radio').style.borderColor = method === 'Cash' ? 'var(--gold)' : '';
+  document.getElementById('pay-zelle').querySelector('.pay-radio').style.borderColor = method === 'Zelle' ? 'var(--gold)' : '';
 }
 
 // ── SUBMIT ORDER ─────────────────────────────────────────────────
@@ -1442,8 +1485,8 @@ async function submitOrder() {
     notes: document.getElementById('notes').value,
     items: cartItems,
     total: grandTotal,
-    deposit: Math.round(grandTotal * 0.3),
-    payment_method: 'cash',
+    payment_method: selectedPayMethod,
+    paid_amount: 0,
     status: 'Pending',
     customer_phone: phone,
     branch: selectedBranch,
@@ -1627,13 +1670,14 @@ async function renderAdmin() {
   const filtered = branchFilter ? orders.filter(o => o.branch === branchFilter) : orders;
   const pending = filtered.filter(o => o.status === 'Pending').length;
   const confirmed = filtered.filter(o => o.status === 'Confirmed' || o.status === 'Paid').length;
-  const revenue = filtered.reduce((s, o) => s + (o.deposit || 0), 0);
+  const collected = filtered.reduce((s, o) => s + (o.paid_amount || 0), 0);
+  const outstanding = filtered.reduce((s, o) => s + Math.max(0, (o.total || 0) - (o.paid_amount || 0)), 0);
   const branchLabel = branchFilter ? ` — ${branchFilter}` : '';
   document.getElementById('stats-row').innerHTML = `
     <div class="stat-card"><div class="stat-value">${filtered.length}</div><div class="stat-label">Total Orders${branchLabel}</div></div>
     <div class="stat-card"><div class="stat-value">${confirmed}</div><div class="stat-label">Confirmed</div></div>
-    <div class="stat-card"><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>
-    <div class="stat-card"><div class="stat-value">$${revenue.toLocaleString()}</div><div class="stat-label">Deposits</div></div>`;
+    <div class="stat-card"><div class="stat-value" style="color:var(--sage);">$${collected.toLocaleString()}</div><div class="stat-label">Collected</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--terracotta);">$${outstanding.toLocaleString()}</div><div class="stat-label">Outstanding</div></div>`;
   if (filtered.length === 0) { document.getElementById('orders-list').innerHTML = `<div class="empty-state">📋 No orders yet.</div>`; return; }
   document.getElementById('orders-list').innerHTML = `
     <table class="data-table">
@@ -1646,7 +1690,11 @@ async function renderAdmin() {
           <td style="font-size:12px;">${o.phone||'—'}</td>
           <td>${o.event_date||'—'}<br><span style="font-size:11px;color:var(--muted)">${o.event_time||''}</span></td>
           <td>${o.guests}</td>
-          <td><strong>$${(o.total||0).toLocaleString()}</strong><br><span style="font-size:11px;color:var(--muted)">Dep: $${(o.deposit||0).toLocaleString()}</span></td>
+          <td>
+            <strong>$${(o.total||0).toLocaleString()}</strong><br>
+            <span style="font-size:11px;color:var(--sage);">Paid: $${(o.paid_amount||0).toLocaleString()}</span><br>
+            <span style="font-size:11px;color:${(o.total||0)-(o.paid_amount||0)>0?'var(--terracotta)':'var(--sage)'};">Bal: $${Math.max(0,(o.total||0)-(o.paid_amount||0)).toLocaleString()}</span>
+          </td>
           <td><span class="status-badge status-${(o.status||'pending').toLowerCase()}">${o.status||'Pending'}</span></td>
           <td style="white-space:nowrap;">
             <div style="display:flex;gap:4px;align-items:center;">
@@ -1659,6 +1707,9 @@ async function renderAdmin() {
               </button>`}
               <button class="icon-btn" onclick="openEditModal('${o.id}')" title="Edit Order">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="icon-btn icon-btn-pay" onclick="openPayModal('${o.id}')" title="Record Payment">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
               </button>
               <button class="icon-btn" onclick="openHistoryModal('${o.id}')" title="Change History">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1727,7 +1778,7 @@ function viewOrder(id) {
   const o = orders.find(x => x.id === id);
   if (!o) return;
   const items = (o.items||[]).map(m=>`  • ${m.name} — ${m.tray_key==='piece'?m.qty+' pcs':m.tray_label+' ×'+m.qty} ($${(m.subtotal||m.price||0).toLocaleString()})`).join('\n');
-  alert(`ORDER: ${o.ref}\nBranch: ${o.branch||'—'}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue||'—'}\nGuests: ${o.guests||'—'}\nType: ${o.event_type||'—'}\n\nMenu:\n${items}\n\nTotal: $${(o.total||0).toLocaleString()}\nDeposit: $${(o.deposit||0).toLocaleString()}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
+  alert(`ORDER: ${o.ref}\nBranch: ${o.branch||'—'}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue||'—'}\nGuests: ${o.guests||'—'}\nType: ${o.event_type||'—'}\n\nMenu:\n${items}\n\nTotal: $${(o.total||0).toLocaleString()}\nPaid: $${(o.paid_amount||0).toLocaleString()}\nBalance: $${Math.max(0,(o.total||0)-(o.paid_amount||0)).toLocaleString()}\nPayment: ${o.payment_method||"—"}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
 }
 
 async function confirmOrder(id) {
@@ -1943,7 +1994,6 @@ async function saveEditOrder() {
     status: document.getElementById('edit-status').value,
     items: validItems,
     total: newTotal,
-    deposit: newDeposit,
   };
 
   // If order was Confirmed/Paid and items or key details changed, revert to Pending
@@ -2100,10 +2150,113 @@ function closeHistoryModal() {
   document.getElementById('history-modal').style.display = 'none';
 }
 
+// ── PAY MODAL ────────────────────────────────────────────────────
+let payingOrderId = null;
+let payModalMethod = 'Cash';
+
+function openPayModal(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  payingOrderId = id;
+  payModalMethod = o.payment_method || 'Cash';
+
+  const balance = Math.max(0, (o.total || 0) - (o.paid_amount || 0));
+  document.getElementById('pay-modal-ref').textContent = `${o.ref} — ${o.name}`;
+  document.getElementById('pay-modal-balance').innerHTML = `
+    <div style="display:flex;gap:20px;background:var(--cream);border-radius:6px;padding:12px 14px;">
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Order Total</div><div style="font-size:16px;font-weight:600;font-family:'Cormorant Garamond',serif;">$${(o.total||0).toLocaleString()}</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Already Paid</div><div style="font-size:16px;font-weight:600;color:var(--sage);font-family:'Cormorant Garamond',serif;">$${(o.paid_amount||0).toLocaleString()}</div></div>
+      <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Balance Due</div><div style="font-size:16px;font-weight:600;color:${balance>0?'var(--terracotta)':'var(--sage)'};font-family:'Cormorant Garamond',serif;">$${balance.toLocaleString()}</div></div>
+    </div>`;
+
+  // Set payment method buttons
+  selectPayModalMethod(payModalMethod);
+  document.getElementById('pay-amount').value = '';
+  document.getElementById('pay-notes').value = '';
+  document.getElementById('pay-new-balance').textContent = '';
+  document.getElementById('pay-modal-error').style.display = 'none';
+  document.getElementById('pay-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('pay-amount').focus(), 100);
+}
+
+function selectPayModalMethod(method) {
+  payModalMethod = method;
+  document.getElementById('pmod-cash').classList.toggle('selected', method === 'Cash');
+  document.getElementById('pmod-zelle').classList.toggle('selected', method === 'Zelle');
+}
+
+function updatePayBalance() {
+  const o = orders.find(x => x.id === payingOrderId);
+  if (!o) return;
+  const amount = parseFloat(document.getElementById('pay-amount').value) || 0;
+  const newPaid = (o.paid_amount || 0) + amount;
+  const newBalance = Math.max(0, (o.total || 0) - newPaid);
+  const el = document.getElementById('pay-new-balance');
+  if (amount <= 0) { el.textContent = ''; return; }
+  el.innerHTML = `After this payment → Paid: <strong style="color:var(--sage);">$${newPaid.toLocaleString()}</strong> · Balance: <strong style="color:${newBalance>0?'var(--terracotta)':'var(--sage)'};">$${newBalance.toLocaleString()}</strong>`;
+}
+
+function closePayModal() {
+  document.getElementById('pay-modal').style.display = 'none';
+  payingOrderId = null;
+}
+
+async function savePayment() {
+  const o = orders.find(x => x.id === payingOrderId);
+  if (!o) return;
+  const amount = parseFloat(document.getElementById('pay-amount').value);
+  if (!amount || amount <= 0) {
+    const err = document.getElementById('pay-modal-error');
+    err.textContent = 'Please enter a valid amount'; err.style.display = 'block'; return;
+  }
+  const btn = document.getElementById('pay-save-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+  document.getElementById('pay-modal-error').style.display = 'none';
+
+  const receivedBy = currentUser ? `${currentUser.name || currentUser.phone} (${currentUser.phone})` : 'admin';
+  const newPaidAmount = (o.paid_amount || 0) + amount;
+  const newBalance = Math.max(0, (o.total || 0) - newPaidAmount);
+  const newStatus = newBalance === 0 ? 'Paid' : o.status;
+
+  try {
+    // Insert payment record
+    await db.insert('order_payments', {
+      order_id: o.id,
+      order_ref: o.ref,
+      amount,
+      payment_method: payModalMethod,
+      received_by: receivedBy,
+      notes: document.getElementById('pay-notes').value.trim() || null,
+    });
+
+    // Update order paid_amount, payment_method, and status if fully paid
+    const orderUpdates = { paid_amount: newPaidAmount, payment_method: payModalMethod };
+    if (newStatus === 'Paid') orderUpdates.status = 'Paid';
+    await db.update('orders', 'id', o.id, orderUpdates);
+
+    // Write audit
+    await writeAudit(o, 'status_change',
+      { paid_amount: o.paid_amount, status: o.status },
+      { paid_amount: newPaidAmount, payment_method: payModalMethod, received_by: receivedBy, status: newStatus, amount_received: amount }
+    );
+
+    // Update local state
+    Object.assign(o, orderUpdates);
+    showToast(`✓ $${amount.toLocaleString()} recorded — by ${receivedBy}`);
+    closePayModal();
+    renderAdmin();
+  } catch(err) {
+    const errEl = document.getElementById('pay-modal-error');
+    errEl.textContent = '⚠ ' + (err.message || 'Save failed'); errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Save Payment'; btn.disabled = false;
+  }
+}
+
 function exportCSV() {
   if (orders.length === 0) { showToast('No orders to export'); return; }
-  const headers = 'Ref,Name,Email,Phone,Date,Venue,Guests,Total,Deposit,Status,Event Type';
-  const rows = orders.map(o => `${o.ref},"${o.name}",${o.email},${o.phone||''},${o.event_date},"${o.venue}",${o.guests},${o.total||0},${o.deposit||0},${o.status},"${o.event_type||''}"`);
+  const headers = 'Ref,Branch,Name,Email,Phone,Date,Venue,Guests,Total,Paid,Balance,Payment Method,Status,Event Type';
+  const rows = orders.map(o => `${o.ref},${o.branch||''},"${o.name}",${o.email},${o.phone||''},${o.event_date},"${o.venue||''}",${o.guests||''},${o.total||0},${o.paid_amount||0},${Math.max(0,(o.total||0)-(o.paid_amount||0))},${o.payment_method||''},${o.status},"${o.event_type||''}"`);
   const csv = [headers, ...rows].join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
