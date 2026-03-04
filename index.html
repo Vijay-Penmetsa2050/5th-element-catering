@@ -3,47 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>5th Element Indian Grill – Catering</title>
+<title>5th Element – Catering</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--cream:#f8f4ee;--warm-white:#fdfaf6;--charcoal:#1a1714;--dark-brown:#2c2420;--gold:#b8860b;--gold-light:#d4a843;--terracotta:#c4623a;--sage:#6b7c5e;--muted:#8a8178;--border:#e0d8ce;}
+:root{
+  --cream:#fdf3e3;
+  --warm-white:#fff8ee;
+  --charcoal:#1c0a00;
+  --dark-brown:#140600;
+  --saffron:#f4a800;
+  --saffron-light:#ffbf2e;
+  --turmeric:#e8890a;
+  --burgundy:#8b1a1a;
+  --burgundy-light:#b02020;
+  --spice:#c0392b;
+  --sage:#5a8a3c;
+  --muted:#9a7a5a;
+  --border:#e8d0a8;
+  /* aliases for existing vars */
+  --gold:#f4a800;
+  --gold-light:#ffbf2e;
+  --terracotta:#c0392b;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;}
 
 /* ── NAV ── */
-nav{background:var(--charcoal);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:200;}
-.nav-brand{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--gold-light);letter-spacing:0.06em;white-space:nowrap;cursor:pointer;}
+nav{background:#1c0a00;border-bottom:2px solid #f4a800;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:200;}
+.nav-brand{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-light);letter-spacing:0.12em;white-space:nowrap;cursor:pointer;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
 .nav-right{display:flex;align-items:center;gap:8px;}
-.nav-btn{background:none;border:1px solid rgba(212,168,67,0.35);color:#c8b88a;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all 0.2s;}
-.nav-btn:hover{background:rgba(212,168,67,0.12);border-color:var(--gold-light);color:var(--gold-light);}
+.nav-btn{background:none;border:1px solid rgba(244,168,0,0.4);color:#f4c84a;font-family:'DM Sans',sans-serif;font-size:12px;letter-spacing:0.05em;text-transform:uppercase;padding:7px 14px;border-radius:4px;cursor:pointer;transition:all 0.2s;}
+.nav-btn:hover{background:rgba(244,168,0,0.15);border-color:var(--saffron-light);color:var(--saffron-light);}
 .nav-btn.primary{background:var(--gold);border-color:var(--gold);color:var(--charcoal);font-weight:500;}
 .nav-btn.primary:hover{background:var(--gold-light);border-color:var(--gold-light);}
 .nav-user{font-size:12px;color:#c8b88a;letter-spacing:0.03em;}
-.cart-btn{background:var(--gold);color:var(--charcoal);border:none;padding:8px 14px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;}
-.cart-btn:hover{background:var(--gold-light);}
-.cart-count{background:var(--charcoal);color:var(--gold-light);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;}
+.cart-btn{background:#f4a800;color:#1c0a00;border:none;padding:8px 14px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;}
+.cart-btn:hover{background:#ffbf2e;}
+.cart-count{background:#1c0a00;color:#ffbf2e;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:600;}
 
 /* ── VIEWS ── */
 .view{display:none;}.view.active{display:block;}
 
 /* ── HERO ── */
-.hero{background:var(--dark-brown);min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 65% 35%,rgba(184,134,11,0.2) 0%,transparent 55%),radial-gradient(ellipse at 20% 75%,rgba(196,98,58,0.14) 0%,transparent 50%);pointer-events:none;}
+.hero{background:#140600;min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 70% 20%, rgba(244,168,0,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 70%, rgba(139,26,26,0.22) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(192,57,43,0.12) 0%, transparent 40%);
+  pointer-events:none;}
+.hero::after{content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle, rgba(244,168,0,0.06) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;opacity:0.5;}
 .hero-inner{position:relative;z-index:1;max-width:640px;}
-.hero-eyebrow{font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;}
+.hero-eyebrow{font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:var(--saffron);margin-bottom:20px;}
 .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,8vw,72px);font-weight:300;color:var(--warm-white);line-height:1.05;margin-bottom:20px;}
-.hero h1 em{font-style:italic;color:var(--gold-light);}
-.hero-desc{color:#9a9088;font-size:15px;max-width:440px;margin:0 auto 36px;line-height:1.7;}
+.hero h1 em{font-style:italic;color:var(--saffron-light);}
+.hero-desc{color:#c8a882;font-size:15px;max-width:440px;margin:0 auto 36px;line-height:1.7;}
 .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 .btn-hero{padding:16px 36px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;}
-.btn-hero-primary{background:var(--gold);color:var(--charcoal);border:2px solid var(--gold);}
-.btn-hero-primary:hover{background:var(--gold-light);border-color:var(--gold-light);transform:translateY(-2px);}
-.btn-hero-outline{background:transparent;color:var(--warm-white);border:2px solid rgba(255,255,255,0.25);}
-.btn-hero-outline:hover{border-color:var(--gold-light);color:var(--gold-light);}
+.btn-hero-primary{background:var(--saffron);color:#1c0a00;border:2px solid var(--saffron);font-weight:600;}
+.btn-hero-primary:hover{background:var(--saffron-light);border-color:var(--saffron-light);transform:translateY(-2px);}
+.btn-hero-outline{background:transparent;color:var(--warm-white);border:2px solid rgba(244,168,0,0.4);}
+.btn-hero-outline:hover{border-color:var(--saffron-light);color:var(--saffron-light);}
 .hero-features{display:flex;gap:32px;justify-content:center;margin-top:48px;flex-wrap:wrap;}
-.hero-feat{font-size:12px;color:#7a7068;letter-spacing:0.04em;display:flex;align-items:center;gap:6px;}
-.hero-feat::before{content:'✦';color:var(--gold);font-size:10px;}
+.hero-feat{font-size:12px;color:#c8a070;letter-spacing:0.04em;display:flex;align-items:center;gap:6px;}
+.hero-feat::before{content:'✦';color:var(--saffron);font-size:9px;}
 
 /* ── MENU PAGE ── */
 .menu-page{max-width:980px;margin:0 auto;padding:32px 20px 100px;}
@@ -245,7 +273,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 
 <!-- ═══ NAV ═══ -->
 <nav>
-  <div class="nav-brand" onclick="goHome()">✦ 5th Element Indian Grill</div>
+  <div class="nav-brand" onclick="goHome()">✦ 5th Element</div>
   <div class="nav-right" id="nav-right">
     <!-- Rendered by JS based on auth state -->
   </div>
@@ -255,17 +283,22 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 <div id="landing-view" class="view active">
   <div class="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow">Catering & Private Events</div>
-      <h1>Bold Flavors,<br><em>Timeless</em><br>Celebrations</h1>
-      <p class="hero-desc">From intimate corporate lunches to grand wedding receptions, 5th Element Indian Grill brings the rich, aromatic flavors of India directly to your event.</p>
+      <div class="hero-eyebrow">Catering &amp; Private Events</div>
+      <h1>Authentic Flavors,<br><em>Unforgettable</em><br>Celebrations</h1>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto 28px;max-width:320px;">
+        <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(244,168,0,0.5));"></div>
+        <span style="color:#f4a800;font-size:18px;letter-spacing:6px;">✦ ✦ ✦</span>
+        <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,rgba(244,168,0,0.5));"></div>
+      </div>
+      <p class="hero-desc">From intimate corporate lunches to grand wedding receptions — 5th Element brings the rich, aromatic spices of India directly to your table. Pompano Beach &amp; Delray Beach.</p>
       <div class="hero-actions">
-        <button class="btn-hero btn-hero-primary" onclick="startOrdering()">Order Now →</button>
+        <button class="btn-hero btn-hero-primary" onclick="startOrdering()">Browse Menu &amp; Order →</button>
         <button class="btn-hero btn-hero-outline" onclick="openAuthModal()">Sign In</button>
       </div>
       <div class="hero-features">
         <span class="hero-feat">Authentic Indian Cuisine</span>
-        <span class="hero-feat">30% Deposit to Book</span>
-        <span class="hero-feat">Groups of 10–500+</span>
+        <span class="hero-feat">Cash · 30% Deposit to Book</span>
+        <span class="hero-feat">Groups of 10 – 500+</span>
       </div>
     </div>
   </div>
@@ -393,6 +426,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
       </div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         <button class="pdf-btn" onclick="downloadQuote()">⬇ Download PDF</button>
+        <button class="pdf-btn" onclick="printKitchen()" style="background:var(--dark-brown);color:var(--gold-light);">🍳 Print to Kitchen</button>
         <a id="view-order-link" href="#" target="_blank" class="pdf-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">View Order Page</a>
         <button class="btn-primary" onclick="resetAll()">Place New Order</button>
       </div>
@@ -858,12 +892,34 @@ function renderMenu() {
   }).join('');
 }
 
+// Categories that never have a spice level
+const NO_SPICE_CATEGORIES = ['desserts', 'dessert', 'breads', 'bread', 'naan', 'naans', 'rice', 'drinks', 'beverages'];
+// Categories sold by number of pieces (not tray size)
+const PIECE_CATEGORIES = ['naan', 'naans', 'breads', 'bread'];
+
+function itemHasSpice(item) {
+  if (item.has_spice === true) return true;
+  if (item.has_spice === false) return false;
+  const cat = (item.category || '').toLowerCase().trim();
+  return !NO_SPICE_CATEGORIES.includes(cat);
+}
+
+function itemSoldByPiece(item) {
+  if (item.sold_by_piece === true) return true;
+  if (item.sold_by_piece === false) return false;
+  const cat = (item.category || '').toLowerCase().trim();
+  return PIECE_CATEGORIES.includes(cat);
+}
+
 function renderMenuCard(item) {
   const hasAny = TRAY_SIZES.some(t => getQty(item.id, t.key) > 0);
   const sizes = TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
   const cartCount = Object.entries(cart)
     .filter(([k]) => k.startsWith(item.id + '::'))
     .reduce((s, [,e]) => s + e.qty, 0);
+  const showSpice = itemHasSpice(item);
+  const byPiece = itemSoldByPiece(item);
+  const panelTitle = byPiece ? 'Select quantity (pieces)' : (showSpice ? 'Select tray size & spice level' : 'Select tray size');
 
   return `<div class="menu-card ${hasAny?'in-cart':''}" id="card-${item.id}">
     <div class="menu-card-summary" onclick="toggleCard('${item.id}')">
@@ -878,7 +934,7 @@ function renderMenuCard(item) {
       <div class="menu-card-chevron">▼</div>
     </div>
     <div class="menu-card-tray-panel" id="panel-${item.id}">
-      <div class="tray-panel-title">Select tray size & spice level</div>
+      <div class="tray-panel-title">${panelTitle}</div>
       <div class="tray-rows">
         ${sizes.map(t => {
           const qty = getQty(item.id, t.key);
@@ -886,8 +942,8 @@ function renderMenuCard(item) {
           return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-${t.key}">
             <div class="tray-row-top">
               <div class="tray-label">
-                <div class="tray-name">${t.label}</div>
-                <div class="tray-price">$${item[t.priceKey]}</div>
+                <div class="tray-name">${byPiece ? t.label + ' pcs' : t.label}</div>
+                <div class="tray-price">$${item[t.priceKey]}${byPiece ? ' each' : ''}</div>
               </div>
               <div class="tray-qty-ctrl">
                 <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',-1);event.stopPropagation()">−</button>
@@ -895,7 +951,7 @@ function renderMenuCard(item) {
                 <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',1);event.stopPropagation()">+</button>
               </div>
             </div>
-            <div class="spicy-row">
+            ${showSpice ? `<div class="spicy-row">
               <span class="spicy-label">🌶 Spice level:</span>
               <div class="spicy-ctrl">
                 <button class="spicy-btn" onclick="changeSpicy('${item.id}','${t.key}',-1);event.stopPropagation()">−</button>
@@ -905,7 +961,7 @@ function renderMenuCard(item) {
               <div class="spicy-indicator" id="spicy-pips-${item.id}-${t.key}">
                 ${renderSpicyPips(spicy)}
               </div>
-            </div>
+            </div>` : ''}
           </div>`;
         }).join('')}
       </div>
@@ -1215,7 +1271,7 @@ function downloadQuote() {
   // Header band
   doc.setFillColor(26,23,20); doc.rect(0,0,210,50,'F');
   doc.setTextColor(212,168,67); doc.setFontSize(22); doc.setFont('helvetica','italic');
-  doc.text('5th Element Indian Grill', 20, 27);
+  doc.text('5th Element', 20, 27);
   doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(160,152,144);
   doc.text('CATERING ORDER', 20, 39); doc.text(o.ref, 190, 39, {align:'right'});
   // Client + Event
@@ -1259,8 +1315,76 @@ function downloadQuote() {
     doc.text(doc.splitTextToSize(o.notes,170),20,y+8);
   }
   doc.setFontSize(8); doc.setTextColor(160,152,144);
-  doc.text('Thank you for choosing 5th Element Indian Grill. We look forward to serving you.',105,285,{align:'center'});
+  doc.text('Thank you for choosing 5th Element. We look forward to serving you.',105,285,{align:'center'});
   doc.save(`Order-${o.ref}.pdf`);
+}
+
+// ── PRINT TO KITCHEN ────────────────────────────────────────────
+function printKitchen() {
+  if (!currentOrder) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const o = currentOrder;
+
+  // Header band
+  doc.setFillColor(26,23,20); doc.rect(0,0,210,38,'F');
+  doc.setTextColor(212,168,67); doc.setFontSize(16); doc.setFont('helvetica','bold');
+  doc.text('KITCHEN ORDER', 20, 18);
+  doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.setTextColor(160,152,144);
+  doc.text(o.ref, 190, 14, {align:'right'});
+  const dateStr = o.date ? new Date(o.date+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
+  const timeStr = o.time ? (()=>{ const [h,m]=o.time.split(':'); const hr=parseInt(h); return `${hr%12||12}:${m} ${hr>=12?'PM':'AM'}`; })() : '';
+  doc.setTextColor(200,184,138); doc.setFontSize(9);
+  doc.text(`${dateStr}${timeStr?' at '+timeStr:''}  ·  ${o.budget||''}${o.guests?' · '+o.guests+' guests':''}`, 20, 30);
+  doc.text(`Customer: ${o.name||''}  ·  ${o.phone||''}`, 190, 30, {align:'right'});
+
+  let y = 50;
+
+  // Column headers
+  doc.setFillColor(245,241,235); doc.rect(14, y-5, 182, 10, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(26,23,20);
+  doc.text('ITEM', 18, y+1);
+  doc.text('TRAY', 105, y+1);
+  doc.text('QTY', 145, y+1);
+  doc.text('SPICE', 175, y+1);
+  y += 10;
+  doc.setDrawColor(220,212,202); doc.line(14, y, 196, y);
+  y += 6;
+
+  (o.items||[]).forEach((item, idx) => {
+    const spicy = item.spicy_level;
+    if (idx % 2 === 0) { doc.setFillColor(252,250,247); doc.rect(14, y-5, 182, 10, 'F'); }
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(26,23,20);
+    doc.text(String(item.name||''), 18, y+1);
+    doc.setFontSize(9); doc.setTextColor(80,72,65);
+    doc.text(String(item.tray_label||'—'), 105, y+1);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(26,23,20);
+    doc.text(String(item.qty||1), 145, y+1);
+    if (spicy) {
+      const r = spicy<=3?107:spicy<=6?184:196, g = spicy<=3?156:spicy<=6?134:98, b = spicy<=3?94:spicy<=6?11:58;
+      doc.setTextColor(r,g,b);
+    } else { doc.setTextColor(150,140,130); }
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(spicy ? `${spicy}/10` : '—', 175, y+1);
+    y += 12;
+    if (y > 270) { doc.addPage(); y = 20; }
+  });
+
+  doc.setDrawColor(200,192,182); doc.line(14, y, 196, y);
+  y += 8;
+
+  if (o.notes && o.notes.trim()) {
+    doc.setFillColor(255,252,240); doc.roundedRect(14, y, 182, 22, 2, 2, 'F');
+    doc.setDrawColor(212,168,67); doc.roundedRect(14, y, 182, 22, 2, 2, 'D');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(184,134,11);
+    doc.text('SPECIAL REQUESTS:', 19, y+8);
+    doc.setFont('helvetica','normal'); doc.setTextColor(60,52,45);
+    doc.text(doc.splitTextToSize(o.notes, 158)[0]||'', 19, y+16);
+  }
+
+  doc.setFontSize(8); doc.setTextColor(160,152,144); doc.setFont('helvetica','normal');
+  doc.text('— Kitchen copy — no prices —', 105, 290, {align:'center'});
+  doc.save(`Kitchen-${o.ref}.pdf`);
 }
 
 // ── ADMIN DASHBOARD ──────────────────────────────────────────────
