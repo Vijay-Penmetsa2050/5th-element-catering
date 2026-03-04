@@ -121,6 +121,9 @@ nav{background:#1c0a00;border-bottom:2px solid #f4a800;padding:0 24px;display:fl
 .tray-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:none;cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--charcoal);flex-shrink:0;}
 .tray-btn:hover{border-color:var(--gold);color:var(--gold);}
 .tray-qty{font-size:13px;font-weight:500;min-width:16px;text-align:center;}
+.tray-qty-input{font-size:13px;font-weight:500;width:52px;text-align:center;border:1.5px solid var(--border);border-radius:4px;padding:3px 4px;font-family:'DM Sans',sans-serif;color:var(--charcoal);background:var(--cream);-moz-appearance:textfield;}
+.tray-qty-input::-webkit-outer-spin-button,.tray-qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.tray-qty-input:focus{outline:none;border-color:var(--gold);}
 
 /* Spicy level row — only shown when qty > 0 */
 .spicy-row{display:none;align-items:center;gap:8px;padding:7px 12px 10px;border-top:1px solid rgba(224,216,206,0.6);}
@@ -273,6 +276,24 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 .branch-card-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--warm-white);margin-bottom:4px;}
 .branch-card-sub{font-size:11px;color:rgba(244,168,0,0.6);letter-spacing:0.06em;}
 .branch-badge{display:inline-block;background:rgba(244,168,0,0.15);color:var(--saffron);border:1px solid rgba(244,168,0,0.3);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;letter-spacing:0.04em;margin-bottom:10px;}
+
+/* ── EDIT ITEM ROWS ── */
+.edit-item-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.edit-item-row:last-child{border-bottom:none;}
+.edit-item-name{font-size:13px;font-weight:500;}
+
+/* ── AUDIT ENTRIES ── */
+.audit-entry{margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.audit-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);flex-wrap:wrap;}
+.audit-type{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold);}
+.audit-date{font-size:12px;color:var(--muted);margin-left:auto;}
+.audit-by{font-size:11px;color:var(--muted);}
+.audit-diff{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.audit-col{padding:12px 14px;}
+.audit-col:first-child{border-right:1px solid var(--border);}
+.audit-col-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
+.audit-pre{font-size:11px;font-family:monospace;white-space:pre-wrap;word-break:break-all;color:var(--charcoal);line-height:1.5;}
+.audit-pre-new{color:var(--sage);}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;left:24px;max-width:360px;margin:auto;background:var(--charcoal);color:var(--warm-white);padding:13px 18px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;border-left:3px solid var(--gold);}
@@ -580,6 +601,50 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ═══ EDIT ORDER MODAL ═══ -->
+<div class="modal-overlay" id="edit-modal" style="display:none;">
+  <div class="modal-box" style="max-width:560px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div class="modal-title">Edit Order</div>
+    <div class="modal-sub" id="edit-order-ref" style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:16px;margin-bottom:20px;"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div><label class="modal-label">Name</label><input class="modal-input" id="edit-name" type="text"></div>
+      <div><label class="modal-label">Phone</label><input class="modal-input" id="edit-phone" type="tel"></div>
+      <div><label class="modal-label">Email</label><input class="modal-input" id="edit-email" type="email"></div>
+      <div><label class="modal-label">Status</label>
+        <select class="modal-input" id="edit-status" style="appearance:none;cursor:pointer;">
+          <option>Pending</option><option>Confirmed</option><option>Paid</option><option>Cancelled</option>
+        </select>
+      </div>
+      <div><label class="modal-label">Event Date</label><input class="modal-input" id="edit-event-date" type="date"></div>
+      <div><label class="modal-label">Event Time</label><input class="modal-input" id="edit-event-time" type="time"></div>
+      <div><label class="modal-label">Guests</label><input class="modal-input" id="edit-guests" type="number"></div>
+      <div><label class="modal-label">Venue / Address</label><input class="modal-input" id="edit-venue" type="text"></div>
+    </div>
+    <div style="margin-bottom:14px;"><label class="modal-label">Notes</label><textarea class="modal-input" id="edit-notes" rows="2" style="resize:vertical;"></textarea></div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px;padding-top:4px;border-top:1px solid var(--border);">Menu Items</div>
+    <div id="edit-items-list" style="margin-bottom:16px;"></div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="modal-btn gold" id="edit-save-btn" onclick="saveEditOrder()">Save Changes</button>
+      <button class="modal-cancel" style="flex:none;padding:13px 20px;border:1.5px solid var(--border);border-radius:4px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORY MODAL ═══ -->
+<div class="modal-overlay" id="history-modal" style="display:none;">
+  <div class="modal-box" style="max-width:700px;width:100%;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;">
+      <div class="modal-title">Change History</div>
+      <button onclick="closeHistoryModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);">×</button>
+    </div>
+    <div class="modal-sub" id="history-order-ref" style="font-family:'Cormorant Garamond',serif;color:var(--gold);font-size:16px;margin-bottom:20px;"></div>
+    <div id="history-list"></div>
+  </div>
+</div>
 
 <script>
 // ── SUPABASE REST ────────────────────────────────────────────────
@@ -995,7 +1060,10 @@ function renderMenuCard(item) {
               </div>
               <div class="tray-qty-ctrl">
                 <button class="tray-btn" onclick="changeTrayQty('${item.id}','piece',-1);event.stopPropagation()">−</button>
-                <span class="tray-qty" id="tqty-${item.id}-piece">${qty}</span>
+                <input class="tray-qty-input" id="tqty-${item.id}-piece" type="number" min="0" value="${qty}"
+                  onclick="event.stopPropagation()"
+                  onchange="setPieceQty('${item.id}', this);event.stopPropagation()"
+                  oninput="setPieceQty('${item.id}', this);event.stopPropagation()">
                 <button class="tray-btn" onclick="changeTrayQty('${item.id}','piece',1);event.stopPropagation()">+</button>
               </div>
             </div>
@@ -1092,7 +1160,10 @@ function changeTrayQty(itemId, trayKey, delta) {
   }
   // Update qty display
   const qEl = document.getElementById(`tqty-${itemId}-${trayKey}`);
-  if (qEl) qEl.textContent = next;
+  if (qEl) {
+    if (qEl.tagName === 'INPUT') qEl.value = next;
+    else qEl.textContent = next;
+  }
   // Toggle tray row highlight
   const rowEl = document.getElementById(`tray-row-${itemId}-${trayKey}`);
   if (rowEl) rowEl.classList.toggle('has-qty', next > 0);
@@ -1115,6 +1186,39 @@ function changeTrayQty(itemId, trayKey, delta) {
       const cartCount = Object.entries(cart)
         .filter(([k]) => k.startsWith(itemId + '::'))
         .reduce((s,[,e]) => s + e.qty, 0);
+      const existing = badge.querySelector('.in-cart-badge');
+      if (hasAny) {
+        if (existing) existing.textContent = `✓ ${cartCount} in cart`;
+        else badge.insertAdjacentHTML('beforeend', `<span class="in-cart-badge">✓ ${cartCount} in cart</span>`);
+      } else if (existing) existing.remove();
+    }
+  }
+  updateCartUI();
+}
+
+function setPieceQty(itemId, inputEl) {
+  const val = parseInt(inputEl.value) || 0;
+  if (val < 0) { inputEl.value = 0; return; }
+  const cartKey = `${itemId}::piece`;
+  const item = MENU_ITEMS.find(m => m.id === itemId);
+  if (!item) return;
+  const price = item.price_per_piece || 0;
+  const cur = cart[cartKey];
+  if (val === 0) {
+    delete cart[cartKey];
+  } else {
+    cart[cartKey] = { item, tray: { key: 'piece', label: 'Piece' }, qty: val, price, spicy: cur?.spicy || 5 };
+  }
+  inputEl.value = val;
+  const rowEl = document.getElementById(`tray-row-${itemId}-piece`);
+  if (rowEl) rowEl.classList.toggle('has-qty', val > 0);
+  const hasAny = TRAY_SIZES.some(t => getQty(itemId, t.key) > 0) || val > 0;
+  const cardEl = document.getElementById(`card-${itemId}`);
+  if (cardEl) {
+    cardEl.classList.toggle('in-cart', hasAny);
+    const badge = cardEl.querySelector('.menu-card-badges');
+    if (badge) {
+      const cartCount = Object.entries(cart).filter(([k]) => k.startsWith(itemId + '::')).reduce((s,[,e]) => s + e.qty, 0);
       const existing = badge.querySelector('.in-cart-badge');
       if (hasAny) {
         if (existing) existing.textContent = `✓ ${cartCount} in cart`;
@@ -1282,6 +1386,7 @@ async function submitOrder() {
     price: e.price,
     qty: e.qty,
     spicy_level: e.spicy || 5,
+    has_spice: itemHasSpice(e.item),
     subtotal: e.price * e.qty,
   }));
 
@@ -1423,7 +1528,7 @@ function printKitchen() {
   y += 6;
 
   (o.items||[]).forEach((item, idx) => {
-    const spicy = item.spicy_level;
+    const spicy = item.has_spice !== false ? item.spicy_level : null;
     if (idx % 2 === 0) { doc.setFillColor(252,250,247); doc.rect(14, y-5, 182, 10, 'F'); }
     doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(26,23,20);
     doc.text(String(item.name||''), 18, y+1);
@@ -1500,9 +1605,11 @@ async function renderAdmin() {
           <td>${o.guests}</td>
           <td><strong>$${(o.total||0).toLocaleString()}</strong><br><span style="font-size:11px;color:var(--muted)">Dep: $${(o.deposit||0).toLocaleString()}</span></td>
           <td><span class="status-badge status-${(o.status||'pending').toLowerCase()}">${o.status||'Pending'}</span></td>
-          <td>
+          <td style="white-space:nowrap;">
             <button class="action-btn" onclick="viewOrder('${o.id}')">View</button>
-            <button class="action-btn" onclick="confirmOrder('${o.id}')">Confirm</button>
+            ${['Confirmed','Paid'].includes(o.status) ? '' : `<button class="action-btn" onclick="confirmOrder('${o.id}')">Confirm</button>`}
+            <button class="action-btn" onclick="openEditModal('${o.id}')">Edit</button>
+            <button class="action-btn" onclick="openHistoryModal('${o.id}')">History</button>
           </td>
         </tr>`).join('')}
       </tbody>
@@ -1562,19 +1669,208 @@ async function removeAdmin(phone) {
   } catch(err) { showToast('⚠ ' + err.message); }
 }
 
-function viewOrder(i) {
-  const o = orders[i];
-  const items = (o.items||[]).map(m=>`  • ${m.name} — ${m.tray_label||''} ×${m.qty||1} ($${(m.subtotal||m.price||0).toLocaleString()})`).join('\n');
-  alert(`ORDER: ${o.ref}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue}\nGuests: ${o.guests}\nType: ${o.event_type||'—'}\n\nMenu:\n${items}\n\nTotal: $${(o.total||0).toLocaleString()}\nDeposit: $${(o.deposit||0).toLocaleString()}\nPayment: ${o.payment_method}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
+function viewOrder(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  const items = (o.items||[]).map(m=>`  • ${m.name} — ${m.tray_key==='piece'?m.qty+' pcs':m.tray_label+' ×'+m.qty} ($${(m.subtotal||m.price||0).toLocaleString()})`).join('\n');
+  alert(`ORDER: ${o.ref}\nBranch: ${o.branch||'—'}\n\nClient: ${o.name}\nEmail: ${o.email}\nPhone: ${o.phone}\nDate: ${o.event_date} ${o.event_time}\nVenue: ${o.venue||'—'}\nGuests: ${o.guests||'—'}\nType: ${o.event_type||'—'}\n\nMenu:\n${items}\n\nTotal: $${(o.total||0).toLocaleString()}\nDeposit: $${(o.deposit||0).toLocaleString()}\nStatus: ${o.status}\n\nNotes: ${o.notes||'None'}`);
 }
 
-async function confirmOrder(id, i) {
+async function confirmOrder(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
   try {
+    const prev = { status: o.status };
     await db.update('orders', 'id', id, { status: 'Confirmed' });
-    orders[i].status = 'Confirmed';
-    showToast(`Order ${orders[i].ref} confirmed!`);
+    await writeAudit(o, 'status_change', prev, { status: 'Confirmed' });
+    o.status = 'Confirmed';
+    showToast(`Order ${o.ref} confirmed!`);
     renderAdmin();
   } catch(err) { showToast('⚠ ' + err.message); }
+}
+
+// ── AUDIT ────────────────────────────────────────────────────────
+async function writeAudit(order, changeType, previousValue, newValue) {
+  try {
+    await db.insert('order_audits', {
+      order_id: order.id,
+      order_ref: order.ref,
+      changed_by: currentUser?.phone || 'admin',
+      change_type: changeType,
+      previous_value: previousValue,
+      new_value: newValue,
+    });
+  } catch(e) { console.warn('Audit write failed:', e.message); }
+}
+
+// ── EDIT ORDER MODAL ─────────────────────────────────────────────
+let editingOrderId = null;
+
+function openEditModal(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  editingOrderId = id;
+
+  // Populate fields
+  document.getElementById('edit-name').value = o.name || '';
+  document.getElementById('edit-phone').value = o.phone || '';
+  document.getElementById('edit-email').value = o.email || '';
+  document.getElementById('edit-event-date').value = o.event_date || '';
+  document.getElementById('edit-event-time').value = o.event_time || '';
+  document.getElementById('edit-guests').value = o.guests || '';
+  document.getElementById('edit-venue').value = o.venue || '';
+  document.getElementById('edit-notes').value = o.notes || '';
+  document.getElementById('edit-status').value = o.status || 'Pending';
+  document.getElementById('edit-order-ref').textContent = o.ref;
+
+  // Render editable items
+  renderEditItems(o.items || []);
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function renderEditItems(items) {
+  document.getElementById('edit-items-list').innerHTML = items.map((item, idx) => {
+    const isPiece = item.tray_key === 'piece';
+    return `<div class="edit-item-row" id="edit-item-${idx}">
+      <div class="edit-item-name">${item.name} <span style="color:var(--muted);font-size:11px;">${isPiece ? 'per piece' : item.tray_label}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label style="font-size:11px;color:var(--muted);">Qty</label>
+        <input type="number" min="0" value="${item.qty||1}" data-idx="${idx}"
+          style="width:64px;padding:5px 8px;border:1.5px solid var(--border);border-radius:4px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--cream);"
+          onchange="updateEditItemQty(${idx}, this.value)">
+        <button onclick="removeEditItem(${idx})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;" title="Remove">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let editItems = [];
+
+function openEditModal(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  editingOrderId = id;
+  editItems = JSON.parse(JSON.stringify(o.items || [])); // deep copy
+
+  document.getElementById('edit-name').value = o.name || '';
+  document.getElementById('edit-phone').value = o.phone || '';
+  document.getElementById('edit-email').value = o.email || '';
+  document.getElementById('edit-event-date').value = o.event_date || '';
+  document.getElementById('edit-event-time').value = o.event_time || '';
+  document.getElementById('edit-guests').value = o.guests || '';
+  document.getElementById('edit-venue').value = o.venue || '';
+  document.getElementById('edit-notes').value = o.notes || '';
+  document.getElementById('edit-status').value = o.status || 'Pending';
+  document.getElementById('edit-order-ref').textContent = o.ref;
+  renderEditItems(editItems);
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+  editingOrderId = null;
+  editItems = [];
+}
+
+function updateEditItemQty(idx, val) {
+  editItems[idx].qty = parseInt(val) || 0;
+  editItems[idx].subtotal = editItems[idx].price * editItems[idx].qty;
+}
+
+function removeEditItem(idx) {
+  editItems.splice(idx, 1);
+  renderEditItems(editItems);
+}
+
+async function saveEditOrder() {
+  if (!editingOrderId) return;
+  const o = orders.find(x => x.id === editingOrderId);
+  if (!o) return;
+  const btn = document.getElementById('edit-save-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  const validItems = editItems.filter(i => i.qty > 0);
+  const newTotal = validItems.reduce((s, i) => s + (i.price * i.qty), 0);
+  const newDeposit = Math.round(newTotal * 0.3);
+
+  const updates = {
+    name: document.getElementById('edit-name').value.trim(),
+    phone: document.getElementById('edit-phone').value.trim(),
+    email: document.getElementById('edit-email').value.trim(),
+    event_date: document.getElementById('edit-event-date').value,
+    event_time: document.getElementById('edit-event-time').value,
+    guests: parseInt(document.getElementById('edit-guests').value) || null,
+    venue: document.getElementById('edit-venue').value.trim(),
+    notes: document.getElementById('edit-notes').value.trim(),
+    status: document.getElementById('edit-status').value,
+    items: validItems,
+    total: newTotal,
+    deposit: newDeposit,
+  };
+
+  // Build audit snapshot — only changed fields
+  const prev = {};
+  const next = {};
+  ['name','phone','email','event_date','event_time','guests','venue','notes','status'].forEach(k => {
+    if (String(o[k]||'') !== String(updates[k]||'')) { prev[k] = o[k]; next[k] = updates[k]; }
+  });
+  const itemsChanged = JSON.stringify(o.items) !== JSON.stringify(validItems);
+  if (itemsChanged) { prev.items = o.items; next.items = validItems; prev.total = o.total; next.total = newTotal; }
+
+  try {
+    await db.update('orders', 'id', editingOrderId, updates);
+    if (Object.keys(prev).length > 0) {
+      await writeAudit(o, itemsChanged ? 'items_edit' : 'details_edit', prev, next);
+    }
+    // Update local state
+    Object.assign(o, updates);
+    showToast(`✓ Order ${o.ref} updated`);
+    closeEditModal();
+    renderAdmin();
+  } catch(err) {
+    showToast('⚠ ' + (err.message || 'Save failed'));
+  } finally {
+    btn.textContent = 'Save Changes'; btn.disabled = false;
+  }
+}
+
+// ── HISTORY MODAL ─────────────────────────────────────────────────
+async function openHistoryModal(id) {
+  const o = orders.find(x => x.id === id);
+  if (!o) return;
+  document.getElementById('history-order-ref').textContent = o.ref;
+  document.getElementById('history-list').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:16px;">Loading…</div>';
+  document.getElementById('history-modal').style.display = 'flex';
+  try {
+    const audits = await db.select('order_audits', `order_id=eq.${o.id}&order=changed_at.desc`);
+    if (audits.length === 0) {
+      document.getElementById('history-list').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:16px 0;">No changes recorded yet.</div>';
+      return;
+    }
+    document.getElementById('history-list').innerHTML = audits.map(a => {
+      const date = new Date(a.changed_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+      const typeLabel = { status_change:'Status Change', items_edit:'Items Edited', details_edit:'Details Edited' }[a.change_type] || a.change_type;
+      const prevJson = JSON.stringify(a.previous_value, null, 2);
+      const nextJson = JSON.stringify(a.new_value, null, 2);
+      return `<div class="audit-entry">
+        <div class="audit-header">
+          <span class="audit-type">${typeLabel}</span>
+          <span class="audit-date">${date}</span>
+          <span class="audit-by">by ${a.changed_by}</span>
+        </div>
+        <div class="audit-diff">
+          <div class="audit-col"><div class="audit-col-label">Before</div><pre class="audit-pre">${prevJson}</pre></div>
+          <div class="audit-col"><div class="audit-col-label">After</div><pre class="audit-pre audit-pre-new">${nextJson}</pre></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(err) {
+    document.getElementById('history-list').innerHTML = `<div style="color:var(--terracotta);font-size:13px;">⚠ ${err.message}</div>`;
+  }
+}
+
+function closeHistoryModal() {
+  document.getElementById('history-modal').style.display = 'none';
 }
 
 function exportCSV() {
