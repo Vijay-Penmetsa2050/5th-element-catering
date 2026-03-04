@@ -264,6 +264,16 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 .logout-btn{background:none;border:1px solid rgba(160,152,144,0.4);color:#a09890;padding:6px 14px;border-radius:4px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:0.05em;transition:all 0.2s;}
 .logout-btn:hover{border-color:var(--terracotta);color:var(--terracotta);}
 
+/* ── BRANCH PICKER ── */
+.hero-branch-label{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(244,168,0,0.7);margin-bottom:14px;}
+.hero-branch-picker{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:4px;}
+.branch-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(244,168,0,0.3);border-radius:10px;padding:18px 32px;cursor:pointer;transition:all 0.2s;min-width:160px;text-align:center;}
+.branch-card:hover{background:rgba(244,168,0,0.1);border-color:var(--saffron);transform:translateY(-2px);}
+.branch-card.selected{background:rgba(244,168,0,0.15);border-color:var(--saffron);box-shadow:0 0 0 3px rgba(244,168,0,0.2);}
+.branch-card-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--warm-white);margin-bottom:4px;}
+.branch-card-sub{font-size:11px;color:rgba(244,168,0,0.6);letter-spacing:0.06em;}
+.branch-badge{display:inline-block;background:rgba(244,168,0,0.15);color:var(--saffron);border:1px solid rgba(244,168,0,0.3);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;letter-spacing:0.04em;margin-bottom:10px;}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;left:24px;max-width:360px;margin:auto;background:var(--charcoal);color:var(--warm-white);padding:13px 18px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;border-left:3px solid var(--gold);}
 .toast.show{transform:translateY(0);opacity:1;}
@@ -291,8 +301,18 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
         <div style="flex:1;height:1px;background:linear-gradient(to left,transparent,rgba(244,168,0,0.5));"></div>
       </div>
       <p class="hero-desc">From intimate corporate lunches to grand wedding receptions — 5th Element brings the rich, aromatic spices of India directly to your table. Pompano Beach &amp; Delray Beach.</p>
-      <div class="hero-actions">
-        <button class="btn-hero btn-hero-primary" onclick="startOrdering()">Browse Menu &amp; Order →</button>
+      <div class="hero-branch-label">Select your location to start ordering</div>
+      <div class="hero-branch-picker">
+        <div class="branch-card" onclick="selectBranch('Pompano Beach')">
+          <div class="branch-card-name">Pompano Beach</div>
+          <div class="branch-card-sub">Broward County</div>
+        </div>
+        <div class="branch-card" onclick="selectBranch('Delray Beach')">
+          <div class="branch-card-name">Delray Beach</div>
+          <div class="branch-card-sub">Palm Beach County</div>
+        </div>
+      </div>
+      <div class="hero-actions" style="margin-top:16px;">
         <button class="btn-hero btn-hero-outline" onclick="openAuthModal()">Sign In</button>
       </div>
       <div class="hero-features">
@@ -313,6 +333,7 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
       <div class="menu-page-title">Our Catering Menu</div>
     </div>
     <div class="menu-page-sub">Prices are per person. Add items to your cart, then proceed to checkout.</div>
+    <div id="menu-branch-badge"></div>
     <div id="menu-categories"></div>
   </div>
 
@@ -450,6 +471,14 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
       <button class="admin-tab" id="tab-admins" onclick="switchAdminTab('admins')">Admins</button>
     </div>
     <div id="admin-orders-panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);">Branch</label>
+        <select id="branch-filter" onchange="renderAdmin()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--cream);color:var(--charcoal);cursor:pointer;outline:none;">
+          <option value="">All Locations</option>
+          <option value="Pompano Beach">Pompano Beach</option>
+          <option value="Delray Beach">Delray Beach</option>
+        </select>
+      </div>
       <div class="stats-row" id="stats-row"></div>
       <div class="data-table-wrap"><div id="orders-list"></div></div>
     </div>
@@ -614,6 +643,7 @@ let orders = [];
 let currentCheckoutStep = 1;
 let currentUser = null;
 let authPhoneValue = '';
+let selectedBranch = '';
 
 // ── NAV RENDERING ────────────────────────────────────────────────
 function renderNav() {
@@ -844,7 +874,20 @@ function showView(id) {
 
 function goHome() { showView('landing-view'); }
 
+function selectBranch(branch) {
+  selectedBranch = branch;
+  document.querySelectorAll('.branch-card').forEach(c => {
+    c.classList.toggle('selected', c.querySelector('.branch-card-name').textContent === branch);
+  });
+  // Small delay so user sees the selection, then go to menu
+  setTimeout(() => startOrdering(), 280);
+}
+
 function startOrdering() {
+  // Update branch badge in menu header
+  const bb = document.getElementById('menu-branch-badge');
+  if (bb) bb.innerHTML = selectedBranch ? `<span class="branch-badge">📍 ${selectedBranch}</span>` : '';
+  if (!selectedBranch) { showToast('Please select a location first'); return; }
   showView('order-view');
   document.getElementById('menu-section').style.display = 'block';
   document.getElementById('checkout-section').style.display = 'none';
@@ -912,14 +955,20 @@ function itemSoldByPiece(item) {
 }
 
 function renderMenuCard(item) {
-  const hasAny = TRAY_SIZES.some(t => getQty(item.id, t.key) > 0);
-  const sizes = TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
+  const hasAny = TRAY_SIZES.some(t => getQty(item.id, t.key) > 0) || getQty(item.id, 'piece') > 0;
   const cartCount = Object.entries(cart)
     .filter(([k]) => k.startsWith(item.id + '::'))
     .reduce((s, [,e]) => s + e.qty, 0);
   const showSpice = itemHasSpice(item);
   const byPiece = itemSoldByPiece(item);
-  const panelTitle = byPiece ? 'Select quantity (pieces)' : (showSpice ? 'Select tray size & spice level' : 'Select tray size');
+  const panelTitle = byPiece ? 'Select quantity' : (showSpice ? 'Select tray size & spice level' : 'Select tray size');
+
+  // For piece-based items: use the first available price, single row with key 'piece'
+  let piecePrice = 0;
+  if (byPiece) {
+    piecePrice = item.price_per_piece || 0;
+  }
+  const sizes = byPiece ? [] : TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
 
   return `<div class="menu-card ${hasAny?'in-cart':''}" id="card-${item.id}">
     <div class="menu-card-summary" onclick="toggleCard('${item.id}')">
@@ -936,14 +985,29 @@ function renderMenuCard(item) {
     <div class="menu-card-tray-panel" id="panel-${item.id}">
       <div class="tray-panel-title">${panelTitle}</div>
       <div class="tray-rows">
-        ${sizes.map(t => {
+        ${byPiece ? (() => {
+          const qty = getQty(item.id, 'piece');
+          return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-piece">
+            <div class="tray-row-top">
+              <div class="tray-label">
+                <div class="tray-name">Quantity</div>
+                <div class="tray-price">$${piecePrice} per piece</div>
+              </div>
+              <div class="tray-qty-ctrl">
+                <button class="tray-btn" onclick="changeTrayQty('${item.id}','piece',-1);event.stopPropagation()">−</button>
+                <span class="tray-qty" id="tqty-${item.id}-piece">${qty}</span>
+                <button class="tray-btn" onclick="changeTrayQty('${item.id}','piece',1);event.stopPropagation()">+</button>
+              </div>
+            </div>
+          </div>`;
+        })() : sizes.map(t => {
           const qty = getQty(item.id, t.key);
           const spicy = getSpicy(item.id, t.key);
           return `<div class="tray-row ${qty>0?'has-qty':''}" id="tray-row-${item.id}-${t.key}">
             <div class="tray-row-top">
               <div class="tray-label">
-                <div class="tray-name">${byPiece ? t.label + ' pcs' : t.label}</div>
-                <div class="tray-price">$${item[t.priceKey]}${byPiece ? ' each' : ''}</div>
+                <div class="tray-name">${t.label}</div>
+                <div class="tray-price">$${item[t.priceKey]}</div>
               </div>
               <div class="tray-qty-ctrl">
                 <button class="tray-btn" onclick="changeTrayQty('${item.id}','${t.key}',-1);event.stopPropagation()">−</button>
@@ -1011,8 +1075,14 @@ function changeTrayQty(itemId, trayKey, delta) {
   const cartKey = `${itemId}::${trayKey}`;
   const item = MENU_ITEMS.find(m => m.id === itemId);
   if (!item) return;
-  const tray = TRAY_SIZES.find(t => t.key === trayKey);
-  const price = item[tray.priceKey];
+  // Handle piece-based items (single 'piece' key, no tray size)
+  const isPiece = trayKey === 'piece';
+  const tray = isPiece
+    ? { key: 'piece', label: 'Piece' }
+    : TRAY_SIZES.find(t => t.key === trayKey);
+  const price = isPiece
+    ? (item.price_per_piece || 0)
+    : item[tray.priceKey];
   const cur = cart[cartKey];
   const next = Math.max(0, (cur?.qty || 0) + delta);
   if (next === 0) {
@@ -1023,11 +1093,11 @@ function changeTrayQty(itemId, trayKey, delta) {
   // Update qty display
   const qEl = document.getElementById(`tqty-${itemId}-${trayKey}`);
   if (qEl) qEl.textContent = next;
-  // Toggle tray row highlight + show/hide spicy row
+  // Toggle tray row highlight
   const rowEl = document.getElementById(`tray-row-${itemId}-${trayKey}`);
   if (rowEl) rowEl.classList.toggle('has-qty', next > 0);
-  // Update spicy pips for default level when first added
-  if (next > 0) {
+  // Update spicy pips (only for non-piece items)
+  if (next > 0 && !isPiece) {
     const spicy = cart[cartKey].spicy;
     const valEl = document.getElementById(`spicy-${itemId}-${trayKey}`);
     if (valEl) valEl.textContent = spicy;
@@ -1035,7 +1105,7 @@ function changeTrayQty(itemId, trayKey, delta) {
     if (pipsEl) pipsEl.innerHTML = renderSpicyPips(spicy);
   }
   // Update card border + in-cart badge
-  const hasAny = TRAY_SIZES.some(t => getQty(itemId, t.key) > 0);
+  const hasAny = TRAY_SIZES.some(t => getQty(itemId, t.key) > 0) || getQty(itemId, 'piece') > 0;
   const cardEl = document.getElementById(`card-${itemId}`);
   if (cardEl) {
     cardEl.classList.toggle('in-cart', hasAny);
@@ -1079,7 +1149,7 @@ function renderCartItems() {
     <div class="cart-item">
       <div class="cart-item-info">
         <div class="cart-item-name">${e.item.name}</div>
-        <div class="cart-item-price">${e.tray.label} tray · $${e.price} · 🌶 ${e.spicy || 5}/10</div>
+        <div class="cart-item-price">${e.tray.key === 'piece' ? `$${e.price} per piece` : `${e.tray.label} tray · $${e.price}${itemHasSpice(e.item) ? ` · 🌶 ${e.spicy || 5}/10` : ''}`}</div>
       </div>
       <div class="qty-control">
         <button class="qty-btn" onclick="changeTrayQty('${e.item.id}','${e.tray.key}',-1)">−</button>
@@ -1230,6 +1300,7 @@ async function submitOrder() {
     payment_method: 'cash',
     status: 'Pending',
     customer_phone: phone,
+    branch: selectedBranch,
   };
 
   try {
@@ -1404,21 +1475,25 @@ async function renderAdmin() {
   } catch(err) {
     document.getElementById('stats-row').innerHTML = `<div style="color:var(--terracotta);padding:16px;">⚠ ${err.message}</div>`; return;
   }
-  const pending = orders.filter(o => o.status === 'Pending').length;
-  const confirmed = orders.filter(o => o.status === 'Confirmed' || o.status === 'Paid').length;
-  const revenue = orders.reduce((s, o) => s + (o.deposit || 0), 0);
+  const branchFilter = document.getElementById('branch-filter')?.value || '';
+  const filtered = branchFilter ? orders.filter(o => o.branch === branchFilter) : orders;
+  const pending = filtered.filter(o => o.status === 'Pending').length;
+  const confirmed = filtered.filter(o => o.status === 'Confirmed' || o.status === 'Paid').length;
+  const revenue = filtered.reduce((s, o) => s + (o.deposit || 0), 0);
+  const branchLabel = branchFilter ? ` — ${branchFilter}` : '';
   document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card"><div class="stat-value">${orders.length}</div><div class="stat-label">Total Orders</div></div>
+    <div class="stat-card"><div class="stat-value">${filtered.length}</div><div class="stat-label">Total Orders${branchLabel}</div></div>
     <div class="stat-card"><div class="stat-value">${confirmed}</div><div class="stat-label">Confirmed</div></div>
     <div class="stat-card"><div class="stat-value">${pending}</div><div class="stat-label">Pending</div></div>
     <div class="stat-card"><div class="stat-value">$${revenue.toLocaleString()}</div><div class="stat-label">Deposits</div></div>`;
-  if (orders.length === 0) { document.getElementById('orders-list').innerHTML = `<div class="empty-state">📋 No orders yet.</div>`; return; }
+  if (filtered.length === 0) { document.getElementById('orders-list').innerHTML = `<div class="empty-state">📋 No orders yet.</div>`; return; }
   document.getElementById('orders-list').innerHTML = `
     <table class="data-table">
-      <thead><tr><th>Ref</th><th>Client</th><th>Phone</th><th>Event Date</th><th>Guests</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${orders.map((o, i) => `
+      <thead><tr><th>Ref</th><th>Branch</th><th>Client</th><th>Phone</th><th>Event Date</th><th>Guests</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>${filtered.map((o, i) => `
         <tr>
           <td style="font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--gold)">${o.ref}</td>
+          <td><span style="font-size:11px;font-weight:500;">${o.branch||'—'}</span></td>
           <td><strong>${o.name}</strong><br><span style="font-size:11px;color:var(--muted)">${o.email}</span></td>
           <td style="font-size:12px;">${o.phone||'—'}</td>
           <td>${o.event_date||'—'}<br><span style="font-size:11px;color:var(--muted)">${o.event_time||''}</span></td>
@@ -1426,8 +1501,8 @@ async function renderAdmin() {
           <td><strong>$${(o.total||0).toLocaleString()}</strong><br><span style="font-size:11px;color:var(--muted)">Dep: $${(o.deposit||0).toLocaleString()}</span></td>
           <td><span class="status-badge status-${(o.status||'pending').toLowerCase()}">${o.status||'Pending'}</span></td>
           <td>
-            <button class="action-btn" onclick="viewOrder(${i})">View</button>
-            <button class="action-btn" onclick="confirmOrder('${o.id}',${i})">Confirm</button>
+            <button class="action-btn" onclick="viewOrder('${o.id}')">View</button>
+            <button class="action-btn" onclick="confirmOrder('${o.id}')">Confirm</button>
           </td>
         </tr>`).join('')}
       </tbody>
