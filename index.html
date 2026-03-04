@@ -1460,6 +1460,8 @@ async function submitOrder() {
     const orderUrl = `${window.location.origin}${window.location.pathname.replace('index.html','').replace(/\/$/, '')}/order.html?ref=${ref}`;
     document.getElementById('order-link-display').textContent = orderUrl;
     document.getElementById('view-order-link').href = orderUrl;
+    cart = {};
+    updateCartUI();
     showToast('✓ Order confirmed!');
     window.scrollTo(0, 0);
   } catch(err) {
@@ -1747,7 +1749,7 @@ async function writeAudit(order, changeType, previousValue, newValue) {
     await db.insert('order_audits', {
       order_id: order.id,
       order_ref: order.ref,
-      changed_by: currentUser?.phone || 'admin',
+      changed_by: currentUser ? `${currentUser.name || currentUser.phone} (${currentUser.phone})` : 'admin',
       change_type: changeType,
       previous_value: previousValue,
       new_value: newValue,
@@ -1944,13 +1946,20 @@ async function saveEditOrder() {
     deposit: newDeposit,
   };
 
+  // If order was Confirmed/Paid and items or key details changed, revert to Pending
+  const wasConfirmed = ['Confirmed', 'Paid'].includes(o.status);
+  const itemsChanged = JSON.stringify(o.items) !== JSON.stringify(validItems);
+  const detailsChanged = ['event_date','event_time','venue','guests'].some(k => String(o[k]||'') !== String(updates[k]||''));
+  if (wasConfirmed && (itemsChanged || detailsChanged)) {
+    updates.status = 'Pending';
+  }
+
   // Build audit snapshot — only changed fields
   const prev = {};
   const next = {};
   ['name','phone','email','event_date','event_time','guests','venue','notes','status'].forEach(k => {
     if (String(o[k]||'') !== String(updates[k]||'')) { prev[k] = o[k]; next[k] = updates[k]; }
   });
-  const itemsChanged = JSON.stringify(o.items) !== JSON.stringify(validItems);
   if (itemsChanged) { prev.items = o.items; next.items = validItems; prev.total = o.total; next.total = newTotal; }
 
   try {
