@@ -277,23 +277,42 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
 .branch-card-sub{font-size:11px;color:rgba(244,168,0,0.6);letter-spacing:0.06em;}
 .branch-badge{display:inline-block;background:rgba(244,168,0,0.15);color:var(--saffron);border:1px solid rgba(244,168,0,0.3);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:500;letter-spacing:0.04em;margin-bottom:10px;}
 
+/* ── ICON BUTTONS ── */
+.icon-btn{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--border);background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:all 0.15s;flex-shrink:0;}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(244,168,0,0.08);}
+.icon-btn-confirm:hover{border-color:var(--sage);color:var(--sage);background:rgba(90,138,60,0.08);}
+
 /* ── EDIT ITEM ROWS ── */
 .edit-item-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
 .edit-item-row:last-child{border-bottom:none;}
 .edit-item-name{font-size:13px;font-weight:500;}
 
 /* ── AUDIT ENTRIES ── */
-.audit-entry{margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.audit-header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--cream);flex-wrap:wrap;}
-.audit-type{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold);}
-.audit-date{font-size:12px;color:var(--muted);margin-left:auto;}
-.audit-by{font-size:11px;color:var(--muted);}
-.audit-diff{display:grid;grid-template-columns:1fr 1fr;gap:0;}
-.audit-col{padding:12px 14px;}
-.audit-col:first-child{border-right:1px solid var(--border);}
-.audit-col-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:6px;}
-.audit-pre{font-size:11px;font-family:monospace;white-space:pre-wrap;word-break:break-all;color:var(--charcoal);line-height:1.5;}
-.audit-pre-new{color:var(--sage);}
+.audit-entry{margin-bottom:14px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.audit-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--cream);flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.audit-type-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;padding:3px 10px;border-radius:20px;}
+.audit-type-status{background:rgba(90,138,60,0.12);color:var(--sage);}
+.audit-type-items{background:rgba(244,168,0,0.12);color:var(--gold);}
+.audit-type-details{background:rgba(100,149,237,0.12);color:#6495ed;}
+.audit-meta{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.audit-date{font-size:12px;color:var(--muted);}
+.audit-by-pill{background:var(--charcoal);color:var(--saffron);font-size:10px;font-weight:600;letter-spacing:0.04em;padding:3px 10px;border-radius:20px;}
+.audit-body{padding:14px 16px;}
+.audit-field-row{display:grid;grid-template-columns:120px 1fr 1fr;gap:8px;align-items:start;padding:7px 0;border-bottom:1px solid rgba(232,208,168,0.4);}
+.audit-field-row:last-child{border-bottom:none;}
+.audit-field-name{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);font-weight:500;padding-top:2px;}
+.audit-field-old{font-size:13px;color:var(--terracotta);text-decoration:line-through;opacity:0.8;}
+.audit-field-new{font-size:13px;color:var(--sage);font-weight:500;}
+.audit-items-grid{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.audit-item-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:6px;font-size:12px;}
+.audit-item-added{background:rgba(90,138,60,0.08);border:1px solid rgba(90,138,60,0.2);}
+.audit-item-removed{background:rgba(196,98,58,0.08);border:1px solid rgba(196,98,58,0.2);}
+.audit-item-changed{background:rgba(244,168,0,0.07);border:1px solid rgba(244,168,0,0.2);}
+.audit-item-unchanged{background:var(--cream);border:1px solid var(--border);opacity:0.6;}
+.audit-item-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:2px 6px;border-radius:10px;margin-left:8px;}
+.audit-tag-added{background:rgba(90,138,60,0.2);color:var(--sage);}
+.audit-tag-removed{background:rgba(196,98,58,0.2);color:var(--terracotta);}
+.audit-tag-changed{background:rgba(244,168,0,0.2);color:var(--gold);}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;left:24px;max-width:360px;margin:auto;background:var(--charcoal);color:var(--warm-white);padding:13px 18px;border-radius:8px;font-size:13px;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s;border-left:3px solid var(--gold);}
@@ -625,7 +644,29 @@ select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%
     <div style="margin-bottom:14px;"><label class="modal-label">Notes</label><textarea class="modal-input" id="edit-notes" rows="2" style="resize:vertical;"></textarea></div>
 
     <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px;padding-top:4px;border-top:1px solid var(--border);">Menu Items</div>
-    <div id="edit-items-list" style="margin-bottom:16px;"></div>
+    <div id="edit-items-list" style="margin-bottom:12px;"></div>
+
+    <!-- Add item from menu -->
+    <div style="background:var(--cream);border:1.5px dashed var(--border);border-radius:8px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px;">+ Add Item from Menu</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div style="flex:2;min-width:160px;">
+          <label class="modal-label">Item</label>
+          <select id="add-item-select" class="modal-input" style="appearance:none;cursor:pointer;" onchange="onAddItemSelect()">
+            <option value="">Select item…</option>
+          </select>
+        </div>
+        <div id="add-tray-wrap" style="flex:1;min-width:110px;display:none;">
+          <label class="modal-label">Size</label>
+          <select id="add-tray-select" class="modal-input" style="appearance:none;cursor:pointer;"></select>
+        </div>
+        <div style="flex:0 0 80px;">
+          <label class="modal-label">Qty</label>
+          <input id="add-item-qty" type="number" min="1" value="1" class="modal-input">
+        </div>
+        <button onclick="addItemToEdit()" style="flex:0 0 auto;background:var(--gold);border:none;color:var(--charcoal);padding:10px 16px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;">Add</button>
+      </div>
+    </div>
 
     <div style="display:flex;gap:10px;">
       <button class="modal-btn gold" id="edit-save-btn" onclick="saveEditOrder()">Save Changes</button>
@@ -1606,10 +1647,21 @@ async function renderAdmin() {
           <td><strong>$${(o.total||0).toLocaleString()}</strong><br><span style="font-size:11px;color:var(--muted)">Dep: $${(o.deposit||0).toLocaleString()}</span></td>
           <td><span class="status-badge status-${(o.status||'pending').toLowerCase()}">${o.status||'Pending'}</span></td>
           <td style="white-space:nowrap;">
-            <button class="action-btn" onclick="viewOrder('${o.id}')">View</button>
-            ${['Confirmed','Paid'].includes(o.status) ? '' : `<button class="action-btn" onclick="confirmOrder('${o.id}')">Confirm</button>`}
-            <button class="action-btn" onclick="openEditModal('${o.id}')">Edit</button>
-            <button class="action-btn" onclick="openHistoryModal('${o.id}')">History</button>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <button class="icon-btn" onclick="viewOrder('${o.id}')" title="View Order">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              ${['Confirmed','Paid'].includes(o.status) ? '' : `
+              <button class="icon-btn icon-btn-confirm" onclick="confirmOrder('${o.id}')" title="Confirm Order">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>`}
+              <button class="icon-btn" onclick="openEditModal('${o.id}')" title="Edit Order">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="icon-btn" onclick="openHistoryModal('${o.id}')" title="Change History">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </button>
+            </div>
           </td>
         </tr>`).join('')}
       </tbody>
@@ -1763,7 +1815,91 @@ function openEditModal(id) {
   document.getElementById('edit-status').value = o.status || 'Pending';
   document.getElementById('edit-order-ref').textContent = o.ref;
   renderEditItems(editItems);
+  populateAddItemSelect();
   document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function populateAddItemSelect() {
+  const sel = document.getElementById('add-item-select');
+  sel.innerHTML = '<option value="">Select item…</option>';
+  // Group by category
+  const cats = [...new Set(MENU_ITEMS.map(i => i.category))];
+  cats.forEach(cat => {
+    const group = document.createElement('optgroup');
+    group.label = cat;
+    MENU_ITEMS.filter(i => i.category === cat).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.name;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+  // Reset tray/qty
+  document.getElementById('add-tray-wrap').style.display = 'none';
+  document.getElementById('add-item-qty').value = 1;
+}
+
+function onAddItemSelect() {
+  const itemId = document.getElementById('add-item-select').value;
+  const trayWrap = document.getElementById('add-tray-wrap');
+  const traySelect = document.getElementById('add-tray-select');
+  if (!itemId) { trayWrap.style.display = 'none'; return; }
+  const item = MENU_ITEMS.find(m => m.id === itemId);
+  if (!item) return;
+  if (itemSoldByPiece(item)) {
+    trayWrap.style.display = 'none';
+  } else {
+    const sizes = TRAY_SIZES.filter(t => item[t.priceKey] != null && item[t.priceKey] > 0);
+    traySelect.innerHTML = sizes.map(t => `<option value="${t.key}">${t.label} — $${item[t.priceKey]}</option>`).join('');
+    trayWrap.style.display = 'block';
+  }
+}
+
+function addItemToEdit() {
+  const itemId = document.getElementById('add-item-select').value;
+  if (!itemId) { showToast('Please select an item'); return; }
+  const item = MENU_ITEMS.find(m => m.id === itemId);
+  if (!item) return;
+  const qty = parseInt(document.getElementById('add-item-qty').value) || 1;
+  const byPiece = itemSoldByPiece(item);
+
+  if (byPiece) {
+    // Check if already in list
+    const existing = editItems.find(e => e.id === item.id && e.tray_key === 'piece');
+    if (existing) { existing.qty += qty; existing.subtotal = existing.price * existing.qty; }
+    else {
+      editItems.push({
+        id: item.id, name: item.name, category: item.category,
+        tray_key: 'piece', tray_label: 'Piece',
+        price: item.price_per_piece || 0, qty,
+        has_spice: itemHasSpice(item),
+        subtotal: (item.price_per_piece || 0) * qty,
+      });
+    }
+  } else {
+    const trayKey = document.getElementById('add-tray-select').value;
+    const tray = TRAY_SIZES.find(t => t.key === trayKey);
+    if (!tray) { showToast('Please select a size'); return; }
+    const price = item[tray.priceKey];
+    const existing = editItems.find(e => e.id === item.id && e.tray_key === trayKey);
+    if (existing) { existing.qty += qty; existing.subtotal = existing.price * existing.qty; }
+    else {
+      editItems.push({
+        id: item.id, name: item.name, category: item.category,
+        tray_key: trayKey, tray_label: tray.label,
+        price, qty,
+        has_spice: itemHasSpice(item),
+        spicy_level: 5,
+        subtotal: price * qty,
+      });
+    }
+  }
+  renderEditItems(editItems);
+  // Reset selectors
+  document.getElementById('add-item-select').value = '';
+  document.getElementById('add-tray-wrap').style.display = 'none';
+  document.getElementById('add-item-qty').value = 1;
 }
 
 function closeEditModal() {
@@ -1844,29 +1980,111 @@ async function openHistoryModal(id) {
   try {
     const audits = await db.select('order_audits', `order_id=eq.${o.id}&order=changed_at.desc`);
     if (audits.length === 0) {
-      document.getElementById('history-list').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:16px 0;">No changes recorded yet.</div>';
+      document.getElementById('history-list').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:20px 0;text-align:center;">No changes recorded yet.</div>';
       return;
     }
-    document.getElementById('history-list').innerHTML = audits.map(a => {
-      const date = new Date(a.changed_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
-      const typeLabel = { status_change:'Status Change', items_edit:'Items Edited', details_edit:'Details Edited' }[a.change_type] || a.change_type;
-      const prevJson = JSON.stringify(a.previous_value, null, 2);
-      const nextJson = JSON.stringify(a.new_value, null, 2);
-      return `<div class="audit-entry">
-        <div class="audit-header">
-          <span class="audit-type">${typeLabel}</span>
-          <span class="audit-date">${date}</span>
-          <span class="audit-by">by ${a.changed_by}</span>
-        </div>
-        <div class="audit-diff">
-          <div class="audit-col"><div class="audit-col-label">Before</div><pre class="audit-pre">${prevJson}</pre></div>
-          <div class="audit-col"><div class="audit-col-label">After</div><pre class="audit-pre audit-pre-new">${nextJson}</pre></div>
-        </div>
-      </div>`;
-    }).join('');
+    document.getElementById('history-list').innerHTML = audits.map(a => renderAuditEntry(a)).join('');
   } catch(err) {
     document.getElementById('history-list').innerHTML = `<div style="color:var(--terracotta);font-size:13px;">⚠ ${err.message}</div>`;
   }
+}
+
+function renderAuditEntry(a) {
+  const date = new Date(a.changed_at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  const typeMap = { status_change:['Status Change','audit-type-status','●'], items_edit:['Items Edited','audit-type-items','✎'], details_edit:['Details Edited','audit-type-details','✦'] };
+  const [typeLabel, typeClass, typeIcon] = typeMap[a.change_type] || [a.change_type,'audit-type-details','●'];
+  const prev = a.previous_value || {};
+  const next = a.new_value || {};
+
+  let bodyHtml = '';
+
+  if (a.change_type === 'items_edit') {
+    bodyHtml = renderItemsDiff(prev.items || [], next.items || [], prev.total, next.total);
+  } else {
+    // Field-by-field diff for details/status changes
+    const fieldLabels = { status:'Status', name:'Name', phone:'Phone', email:'Email', event_date:'Event Date', event_time:'Event Time', guests:'Guests', venue:'Venue', notes:'Notes', total:'Total', deposit:'Deposit' };
+    const allKeys = [...new Set([...Object.keys(prev), ...Object.keys(next)])].filter(k => k !== 'items');
+    bodyHtml = allKeys.map(k => {
+      const label = fieldLabels[k] || k;
+      const oldVal = prev[k] != null ? String(prev[k]) : '—';
+      const newVal = next[k] != null ? String(next[k]) : '—';
+      return `<div class="audit-field-row">
+        <div class="audit-field-name">${label}</div>
+        <div class="audit-field-old">${oldVal}</div>
+        <div class="audit-field-new">→ ${newVal}</div>
+      </div>`;
+    }).join('');
+    if (!bodyHtml) bodyHtml = '<div style="font-size:13px;color:var(--muted);">No field changes recorded.</div>';
+  }
+
+  return `<div class="audit-entry">
+    <div class="audit-header">
+      <span class="audit-type-badge ${typeClass}">${typeIcon} ${typeLabel}</span>
+      <div class="audit-meta">
+        <span class="audit-date">${date}</span>
+        <span class="audit-by-pill">${a.changed_by}</span>
+      </div>
+    </div>
+    <div class="audit-body">${bodyHtml}</div>
+  </div>`;
+}
+
+function renderItemsDiff(prevItems, nextItems, prevTotal, nextTotal) {
+  // Build lookup maps by item id+tray_key
+  const prevMap = {};
+  prevItems.forEach(i => { prevMap[i.id+'::'+i.tray_key] = i; });
+  const nextMap = {};
+  nextItems.forEach(i => { nextMap[i.id+'::'+i.tray_key] = i; });
+  const allKeys = [...new Set([...Object.keys(prevMap), ...Object.keys(nextMap)])];
+
+  const rows = allKeys.map(k => {
+    const p = prevMap[k];
+    const n = nextMap[k];
+    const item = n || p;
+    const isPiece = item.tray_key === 'piece';
+    const sizeLabel = isPiece ? 'per piece' : item.tray_label;
+    const name = `${item.name} <span style="color:var(--muted);font-size:11px;">${sizeLabel}</span>`;
+
+    if (!p) {
+      // Added
+      return `<div class="audit-item-row audit-item-added">
+        <div>${name} <span class="audit-item-tag audit-tag-added">Added</span></div>
+        <div style="font-weight:600;color:var(--sage);">×${n.qty} — $${(n.subtotal||0).toLocaleString()}</div>
+      </div>`;
+    } else if (!n) {
+      // Removed
+      return `<div class="audit-item-row audit-item-removed">
+        <div>${name} <span class="audit-item-tag audit-tag-removed">Removed</span></div>
+        <div style="font-weight:600;color:var(--terracotta);text-decoration:line-through;">×${p.qty} — $${(p.subtotal||0).toLocaleString()}</div>
+      </div>`;
+    } else if (p.qty !== n.qty) {
+      // Changed
+      return `<div class="audit-item-row audit-item-changed">
+        <div>${name} <span class="audit-item-tag audit-tag-changed">Qty Changed</span></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="color:var(--terracotta);text-decoration:line-through;font-size:12px;">×${p.qty}</span>
+          <span style="color:var(--sage);font-weight:600;">×${n.qty} — $${(n.subtotal||0).toLocaleString()}</span>
+        </div>
+      </div>`;
+    } else {
+      // Unchanged
+      return `<div class="audit-item-row audit-item-unchanged">
+        <div>${name}</div>
+        <div style="color:var(--muted);">×${n.qty} — $${(n.subtotal||0).toLocaleString()}</div>
+      </div>`;
+    }
+  }).join('');
+
+  const totalRow = (prevTotal != null && nextTotal != null && prevTotal !== nextTotal) ? `
+    <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Order Total</span>
+      <span>
+        <span style="color:var(--terracotta);text-decoration:line-through;margin-right:8px;font-size:13px;">$${(prevTotal||0).toLocaleString()}</span>
+        <span style="color:var(--sage);font-weight:600;font-size:14px;">$${(nextTotal||0).toLocaleString()}</span>
+      </span>
+    </div>` : '';
+
+  return `<div class="audit-items-grid">${rows}</div>${totalRow}`;
 }
 
 function closeHistoryModal() {
